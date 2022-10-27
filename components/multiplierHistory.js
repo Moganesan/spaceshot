@@ -4,8 +4,8 @@ import "swiper/css";
 const MultiplierHistory = () => {
   return (
     <Swiper
-      spaceBetween={130}
-      slidesPerView={10}
+      spaceBetween={20}
+      slidesPerView={13}
       onSlideChange={() => console.log("slide change")}
       onSwiper={(swiper) => console.log(swiper)}
     >

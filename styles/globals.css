@@ -6,3 +6,77 @@ body{
     background-color: #0C0F14;
     color: white;
 }
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.button{
+    border: 2px solid #FFDF11;
+    padding: 20px 30px;
+    width: 90px;
+    background-color: rgba(255, 223, 17, 0.2);
+}
+
+.button2{
+    border: 2px solid #FFDF11;
+    padding: 20px 30px;
+    background-color: rgba(255, 223, 17, 0.2);
+    width: 100%;
+}
+.table-body{
+    border-collapse: collapse;
+    margin: 25px 0;
+    font-size: 0.9em;
+    margin-top: 50px;
+    width: 100%;
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+    background-color: #171C25;
+    overflow: hidden;
+}
+
+.table-body th{
+    padding: 12px 50px;
+}
+.table-body td{
+    padding: 12px 15px;
+}
+
+.table-body tr{
+    background-color: #171C25;
+    color: white;
+    text-align: left;
+    font-weight: bold;
+}
+
+tr:nth-of-type(even){
+   color: #06FF3D;
+}
+  
+.spacecraft{
+    margin-top:140px;
+}
+
+.multiplier{
+    position: absolute;
+    left: 50%;
+    bottom: 50%;
+    transform: translate(-50%, 0);
+}
+
+#gamebackground{
+    position: absolute;
+    min-width: 100%;
+    min-height: 100%;
+    z-index: -1;
+}

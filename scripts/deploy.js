@@ -11,7 +11,7 @@ async function main() {
 
   const deployerAddress = deployer.address;
 
-  const contract = await hre.ethers.getContractFactory("Lock");
+  const contract = await hre.ethers.getContractFactory("Spaceshot");
   const deploy = await contract.deploy();
 
   await deploy.deployed();

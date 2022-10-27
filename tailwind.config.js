@@ -9,7 +9,11 @@ module.exports = {
     multiplierHistoryBlue: "#9092FA",
   },
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        VT323: ["VT323", "monospace"],
+      },
+    },
   },
   plugins: [],
 };

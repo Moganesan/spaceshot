@@ -61,4 +61,9 @@ contract Spaceshot {
         startingTime = block.timestamp;
         endingTime = block.timestamp + 10;
     }
+
+    function endGame() public {
+        uint256 timestamp = block.timestamp;
+        require(timestamp >= endingTime, "Game Not Ended");
+    }
 }
