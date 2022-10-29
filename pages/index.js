@@ -1,10 +1,42 @@
 import Head from "next/head";
 import Image from "next/image";
 import Header from "../components/header";
+import { useState } from "react";
+import { ethers } from "ethers";
 import GameSpace from "../components/gamespace";
 import MultiPlierHistory from "../components/multiplierHistory";
 
 export default function Home() {
+  const [amount, setAmount] = useState(0);
+  const [multiplier, setMultiplier] = useState(0);
+
+  const placeBet = async () => {
+    const contractAddress = "0x54c512d21c71a8f6f6edD45A23fA9196c63f825d";
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const accounts = await provider.listAccounts();
+    const signer = provider.getSigner();
+    const network = await provider.getNetwork();
+
+    console.log("Call Game Status");
+
+    const contract = new ethers.Contract(
+      contractAddress,
+      ContractAbi.abi,
+      signer
+    );
+
+    try {
+      await contract.betAmount(amount, multiplier, {
+        value: ethers.utils.parseUnits(
+          ethers.utils.formatEther(amount),
+          "ether"
+        ),
+      });
+      console.log(contractResponse);
+    } catch (err) {
+      console.log(err);
+    }
+  };
   return (
     <div>
       <Header />
@@ -15,6 +47,7 @@ export default function Home() {
           <div className="border-2 w-96 border-yellow-400 px-3 py-3 rounded-md flex flex-col">
             <span className="font-VT323 text-gray-300">Amount</span>
             <input
+              value={amount}
               className="text-white h-10 font-VT323 outline-none bg-transparent px-2 text-2xl"
               type={"number"}
             />
@@ -24,6 +57,7 @@ export default function Home() {
             <div className="flex items-center">
               <span className="font-VT323 text-2xl ml-2">X</span>
               <input
+                value={multiplier}
                 type={"number"}
                 className="text-white h-10 outline-none bg-transparent font-VT323 text-2xl px-2"
               />

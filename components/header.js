@@ -1,12 +1,44 @@
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect } from "react";
 import Image from "next/image";
-const Header = () => {
-  let [openSettingsModal, setOpenSettingsModal] = useState(true);
+import { ethers } from "ethers";
+import { Switch } from "@headlessui/react";
 
-  function closeModal() {
-    setOpenSettingsModal(false);
-  }
+const Header = () => {
+  let [openSettingsModal, setOpenSettingsModal] = useState(false);
+  const [openMenuOptions, setOpenMenuOptions] = useState(false);
+  const [openProfileModal, setOpenProfileModal] = useState(false);
+  const [enableSound, setEnableSound] = useState(false);
+  const [enableAnimation, setEnableAnimation] = useState(false);
+  const [enableChatSound, setEnableChatSound] = useState(false);
+
+  const [depositAmount, setDepositAmount] = useState("");
+
+  const [metaMaskError, setMetaMaskError] = useState(false);
+  const [metaMask, setMetaMask] = useState(false);
+  const [walletAddress, setWalletAddress] = useState("");
+
+  const loginWithMetaMask = async () => {
+    if (typeof window.ethereum == "undefined") {
+      return setMetaMaskError(true);
+    }
+    const accounts = await window.ethereum.request({
+      method: "eth_requestAccounts",
+    });
+
+    setWalletAddress(accounts[0]);
+  };
+
+  const checkAccounts = async () => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const accounts = await provider.listAccounts();
+
+    if (!accounts[0]) {
+      loginWithMetaMask();
+    } else {
+      setWalletAddress(accounts[0]);
+    }
+  };
 
   function OpenSettingsModal() {
     setOpenSettingsModal(true);
@@ -16,25 +48,45 @@ const Header = () => {
     setOpenSettingsModal(false);
   }
 
+  function openMenuOptionModal() {
+    setOpenMenuOptions(true);
+  }
+
+  function closeMenuOptionModal() {
+    setOpenMenuOptions(false);
+  }
+
+  function OpenProfileModal() {
+    setOpenProfileModal(true);
+  }
+
+  function closeProfileModal() {
+    setOpenProfileModal(false);
+  }
+
+  useEffect(() => {
+    checkAccounts();
+  }, []);
+
   return (
     <div className="h-24 px-10 flex items-center justify-between">
       <div className="mr-56">
         <h1 className="text-yellow-400 text-3xl">SPACESHOT</h1>
       </div>
       <div className="w-64 flex items-center justify-around">
-        <button>
+        <button onClick={() => OpenProfileModal()}>
           <Image src={"/profile.svg"} width={40} height={40} />
         </button>
         <button onClick={() => OpenSettingsModal(true)}>
           <Image src={"/settingsicon.svg"} width={40} height={40} />
         </button>
-        <button>
+        <button onClick={() => openMenuOptionModal()}>
           <Image src={"/menuicon.svg"} width={40} height={40} />
         </button>
       </div>
 
       <Transition appear show={openSettingsModal} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={closeModal}>
+        <Dialog as="div" className="relative z-10" onClose={closeSettingsModal}>
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -58,28 +110,182 @@ const Header = () => {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="bg-balckbackground transform overflow-hidden rounded-2xl p-6 text-left align-middle shadow-xl transition-all">
-                  <Dialog.Title
-                    as="h3"
-                    className="text-lg font-medium leading-6 text-gray-900"
-                  >
-                    Payment successful
-                  </Dialog.Title>
-                  <div className="mt-2">
-                    <p className="text-sm text-gray-500">
-                      Your payment has been successfully submitted. We’ve sent
-                      you an email with all of the details of your order.
-                    </p>
-                  </div>
+                <Dialog.Panel className="bg-gray-900 transform overflow-hidden rounded-sm p-6 text-left align-middle shadow-xl transition-all">
+                  <div>
+                    <div className="flex items-center w-96 justify-between">
+                      <div>
+                        <Image src={"/soundicon.svg"} width={60} height={60} />
+                      </div>
+                      <span className="font-VT323 text-5xl ml-10">Sound</span>
+                      <Switch
+                        checked={enableSound}
+                        onChange={setEnableSound}
+                        className={`${
+                          enableSound ? "bg-yellow-400" : "bg-yellow-400"
+                        }
+          relative inline-flex h-[38px] w-[74px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 switch  focus-visible:ring-yellow-300 focus-visible:ring-opacity-75`}
+                      >
+                        <span className="sr-only">Use setting</span>
+                        <span
+                          aria-hidden="true"
+                          className={`${
+                            enableSound ? "translate-x-9" : "translate-x-0"
+                          }
+            pointer-events-none inline-block h-[34px] w-[34px] transform rounded-full bg-yellow-400 shadow-lg ring-0 transition duration-200 ease-in-out`}
+                        />
+                      </Switch>
+                    </div>
+                    <div className="flex mt-10 items-center w-96 justify-between">
+                      <div>
+                        <Image src={"/playicon.svg"} width={60} height={60} />
+                      </div>
+                      <span className="font-VT323 text-5xl ml-10">
+                        Animation
+                      </span>
 
-                  <div className="mt-4">
-                    <button
-                      type="button"
-                      className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                      onClick={closeModal}
-                    >
-                      Got it, thanks!
-                    </button>
+                      <Switch
+                        checked={enableAnimation}
+                        onChange={setEnableAnimation}
+                        className={`${
+                          enableAnimation ? "bg-yellow-400" : "bg-yellow-400"
+                        }
+          relative inline-flex h-[38px] w-[74px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 switch  focus-visible:ring-yellow-300 focus-visible:ring-opacity-75`}
+                      >
+                        <span className="sr-only">Use setting</span>
+                        <span
+                          aria-hidden="true"
+                          className={`${
+                            enableAnimation ? "translate-x-9" : "translate-x-0"
+                          }
+            pointer-events-none inline-block h-[34px] w-[34px] transform rounded-full bg-yellow-400 shadow-lg ring-0 transition duration-200 ease-in-out`}
+                        />
+                      </Switch>
+                    </div>
+
+                    <div className="flex mt-10 items-center w-96 justify-between">
+                      <div>
+                        <Image src={"/chaticon.svg"} width={60} height={60} />
+                      </div>
+                      <span className="font-VT323 ml-10 text-5xl">
+                        Chat Sound
+                      </span>
+
+                      <Switch
+                        checked={enableChatSound}
+                        onChange={setEnableChatSound}
+                        className={`${
+                          enableChatSound ? "bg-yellow-400" : "bg-yellow-400"
+                        }
+          relative inline-flex h-[38px] w-[74px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 switch  focus-visible:ring-yellow-300 focus-visible:ring-opacity-75`}
+                      >
+                        <span className="sr-only">Use setting</span>
+                        <span
+                          aria-hidden="true"
+                          className={`${
+                            enableChatSound ? "translate-x-9" : "translate-x-0"
+                          }
+            pointer-events-none inline-block h-[34px] w-[34px] transform rounded-full bg-yellow-400 shadow-lg ring-0 transition duration-200 ease-in-out`}
+                        />
+                      </Switch>
+                    </div>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
+
+      <Transition appear show={openMenuOptions} as={Fragment}>
+        <Dialog
+          as="div"
+          className="relative z-10"
+          onClose={closeMenuOptionModal}
+        >
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black bg-opacity-25" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className="bg-gray-900 flex flex-col transform overflow-hidden rounded-sm p-6 text-left align-middle shadow-xl transition-all">
+                  <button className="font-VT323 text-5xl px-20 hover:text-yellow-400">
+                    FAQ
+                  </button>
+                  <button className="font-VT323 text-5xl px-20 mt-10  hover:text-yellow-400">
+                    STATICS
+                  </button>
+                  <button className="font-VT323 text-5xl px-20 mt-10  hover:text-yellow-400">
+                    LEADBOARD
+                  </button>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
+
+      <Transition appear show={openProfileModal} as={Fragment}>
+        <Dialog as="div" className="relative z-10" onClose={closeProfileModal}>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black bg-opacity-25" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className="bg-gray-900 transform overflow-hidden rounded-sm p-6 text-left align-middle shadow-xl transition-all">
+                  <div>
+                    <h1 className="font-VT323 text-3xl">
+                      Wallet Address : {walletAddress}
+                    </h1>
+                    <div className="mt-3">
+                      <input
+                        value={depositAmount}
+                        placeholder="SHM"
+                        type={"number"}
+                        className="border-2 bg-gray-900 h-12 border-yellow-400 rounded-sm outline-none px-3"
+                      />
+                      <button className="font-VT323 text-2xl px-9 ml-3 bg-yellow-400 h-12">
+                        DEPOSIT
+                      </button>
+                    </div>
+                    <h1 className="font-VT323 text-3xl mt-3">
+                      Balance : 100SHM
+                    </h1>
                   </div>
                 </Dialog.Panel>
               </Transition.Child>

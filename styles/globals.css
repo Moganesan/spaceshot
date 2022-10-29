@@ -80,3 +80,8 @@ tr:nth-of-type(even){
     min-height: 100%;
     z-index: -1;
 }
+
+.switch{
+    background-color: rgba(255, 223, 17, 0.2);
+
+}
