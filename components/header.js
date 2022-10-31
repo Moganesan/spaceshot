@@ -3,6 +3,7 @@ import { Fragment, useState, useEffect } from "react";
 import Image from "next/image";
 import { ethers } from "ethers";
 import { Switch } from "@headlessui/react";
+import ContractAbi from "../artifacts/contracts/Spaceshot.sol/Spaceshot.json";
 
 const Header = () => {
   let [openSettingsModal, setOpenSettingsModal] = useState(false);
@@ -13,6 +14,8 @@ const Header = () => {
   const [enableChatSound, setEnableChatSound] = useState(false);
 
   const [depositAmount, setDepositAmount] = useState("");
+  const [withdrawAmount, setWithdrawAmount] = useState("");
+  const [accountBalace, setAccountBalance] = useState("");
 
   const [metaMaskError, setMetaMaskError] = useState(false);
   const [metaMask, setMetaMask] = useState(false);
@@ -29,6 +32,54 @@ const Header = () => {
     setWalletAddress(accounts[0]);
   };
 
+  const getBalance = async () => {
+    const contractAddress = "0xD7746beC4f562b4c6eD610417858f97175Fe6854";
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const accounts = await provider.listAccounts();
+    const signer = provider.getSigner();
+    const network = await provider.getNetwork();
+
+    const contract = new ethers.Contract(
+      contractAddress,
+      ContractAbi.abi,
+      signer
+    );
+
+    try {
+      const accountBalance = await contract.getBalance(accounts[0]);
+      const gameBalance = await contract.getGameBalance();
+      console.log("Game Balance", ethers.utils.formatEther(gameBalance));
+      setAccountBalance(ethers.utils.formatEther(accountBalance));
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const DepositAmount = async () => {
+    console.log("Deposit Amount", depositAmount);
+    const contractAddress = "0xD7746beC4f562b4c6eD610417858f97175Fe6854";
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const accounts = await provider.listAccounts();
+    const signer = provider.getSigner();
+    const network = await provider.getNetwork();
+
+    console.log("Call Game Status");
+
+    const contract = new ethers.Contract(
+      contractAddress,
+      ContractAbi.abi,
+      signer
+    );
+
+    try {
+      await contract.deposit({
+        value: ethers.utils.parseEther(depositAmount),
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const checkAccounts = async () => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
@@ -37,6 +88,26 @@ const Header = () => {
       loginWithMetaMask();
     } else {
       setWalletAddress(accounts[0]);
+    }
+  };
+
+  const withdraw = async () => {
+    const contractAddress = "0xD7746beC4f562b4c6eD610417858f97175Fe6854";
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const accounts = await provider.listAccounts();
+    const signer = provider.getSigner();
+    const network = await provider.getNetwork();
+
+    const contract = new ethers.Contract(
+      contractAddress,
+      ContractAbi.abi,
+      signer
+    );
+
+    try {
+      await contract.withdraw(withdrawAmount);
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -66,6 +137,7 @@ const Header = () => {
 
   useEffect(() => {
     checkAccounts();
+    getBalance();
   }, []);
 
   return (
@@ -275,16 +347,35 @@ const Header = () => {
                     <div className="mt-3">
                       <input
                         value={depositAmount}
+                        onChange={(e) => setDepositAmount(e.target.value)}
                         placeholder="SHM"
                         type={"number"}
                         className="border-2 bg-gray-900 h-12 border-yellow-400 rounded-sm outline-none px-3"
                       />
-                      <button className="font-VT323 text-2xl px-9 ml-3 bg-yellow-400 h-12">
+                      <button
+                        onClick={() => DepositAmount()}
+                        className="font-VT323 text-2xl px-9 ml-3 bg-yellow-400 h-12"
+                      >
                         DEPOSIT
                       </button>
                     </div>
+                    <div className="mt-3">
+                      <input
+                        value={withdrawAmount}
+                        onChange={(e) => setWithdrawAmount(e.target.value)}
+                        placeholder="SHM"
+                        type={"number"}
+                        className="border-2 bg-gray-900 h-12 border-yellow-400 rounded-sm outline-none px-3"
+                      />
+                      <button
+                        onClick={() => withdraw()}
+                        className="font-VT323 text-2xl px-9 ml-3 bg-yellow-400 h-12"
+                      >
+                        WITHDRAW
+                      </button>
+                    </div>
                     <h1 className="font-VT323 text-3xl mt-3">
-                      Balance : 100SHM
+                      Balance : {accountBalace} SHM
                     </h1>
                   </div>
                 </Dialog.Panel>
