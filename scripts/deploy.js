@@ -16,6 +16,8 @@ async function main() {
 
   await deploy.deployed();
 
+  await deploy.startNewGame();
+
   const gameStatus = await deploy.checkGameStatus();
 
   console.log("Game Status", gameStatus);

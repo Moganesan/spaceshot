@@ -16,6 +16,8 @@ export default function Home() {
   const [startGame, setStartGame] = useState(false);
   const [multiplierCrash, setMultiplierCrash] = useState(0);
 
+  const [playerDetails, addPlayerDetails] = useState([]);
+
   const incrementBetAmount = () => {
     setAmount((a) => a + 1);
   };
@@ -109,6 +111,16 @@ export default function Home() {
       const events = res.events.find((event) => event.event == "returnResult");
 
       const [_amount, _multiplier, profit] = events.args;
+
+      addPlayerDetails((oldPlayers) => [
+        ...oldPlayers,
+        {
+          player: accounts[0],
+          betAmount: _amount.toNumber(),
+          multiplier: _multiplier.toNumber(),
+          payout: profit.toNumber(),
+        },
+      ]);
 
       console.log(events.args);
     } catch (err) {
@@ -240,7 +252,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* <div className="mt-10">
+        <div className="mt-10">
           <span className="font-VT323 px-10 border-2 py-5 border-yellow-400">
             ALL PLAYERS
           </span>
@@ -254,21 +266,19 @@ export default function Home() {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>Moganesan</td>
-                <td>0.5 SHM</td>
-                <td>x3.00</td>
-                <td>2.38 SHM</td>
-              </tr>
-              <tr>
-                <td>Moganesan</td>
-                <td>0.5 SHM</td>
-                <td>x3.00</td>
-                <td>2.38 SHM</td>
-              </tr>
+              {playerDetails.map((player) => {
+                return (
+                  <tr>
+                    <td>{player.player}</td>
+                    <td>{player.betAmount} SHM</td>
+                    <td>x{player.multiplier}</td>
+                    <td>{player.payout} SHM</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
-        </div> */}
+        </div>
 
         <div className="mt-20" />
       </div>

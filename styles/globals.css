@@ -31,6 +31,13 @@ input[type=number] {
     background-color: rgba(255, 223, 17, 0.2);
     width: 100%;
 }
+
+.button3{
+    border: 2px solid #19ff11;
+    padding: 20px 30px;
+    background-color: rgba(73, 255, 17, 0.2);
+    width: 100%;
+}
 .table-body{
     border-collapse: collapse;
     margin: 25px 0;
