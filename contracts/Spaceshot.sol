@@ -91,10 +91,11 @@ contract Spaceshot {
         uint256 balance = balances[msg.sender];
         require(balance >= amount, "Insuffecient Funds");
         if (multiplier <= gameMultiplier) {
-            balances[msg.sender] += amount * multiplier;
+            uint256 profit = amount * multiplier;
+            balances[msg.sender] += profit * (1 ether);
             emit returnResult(amount, multiplier, amount * multiplier);
         } else {
-            balances[msg.sender] -= amount;
+            balances[msg.sender] -= amount * (1 ether);
             emit returnResult(amount, multiplier, 0);
         }
     }
