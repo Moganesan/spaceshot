@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 const colors = require("tailwindcss/colors");
+const defaultTheme = require("tailwindcss/defaultTheme");
 
 module.exports = {
   content: [
@@ -11,6 +12,10 @@ module.exports = {
     multiplierHistoryBlue: "#9092FA",
   },
   theme: {
+    screens: {
+      smb: "320px",
+      ...defaultTheme.screens,
+    },
     extend: {
       fontFamily: {
         VT323: ["VT323", "monospace"],

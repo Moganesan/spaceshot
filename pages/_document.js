@@ -6,7 +6,6 @@ export default class MyDocument extends Document {
       <Html>
         <Head>
           <meta charSet="UTF-8" />
-          <title>Spaceshot</title>
           <meta
             name="description"
             content="SpaceShot is a fun and social game on Shardeum, It consists of a Space Shuttle that

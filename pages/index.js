@@ -1,28 +1,42 @@
 import Head from "next/head";
 import Image from "next/image";
 import Header from "../components/header";
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { ethers } from "ethers";
 import crypto from "crypto";
 import GameSpace from "../components/gamespace";
 import MultiPlierHistory from "../components/multiplierHistory";
 import ContractAbi from "../artifacts/contracts/Spaceshot.sol/Spaceshot.json";
+import IntervalTimer from "../components/IntervalTimer";
 
 export default function Home() {
   const [amount, setAmount] = useState(0);
   const [multiplier, setMultiplier] = useState(0);
   const [gameHash, setGameHash] = useState("");
   const [clientSeed, setClientSeed] = useState("");
+  const [seconds, setSeconds] = useState(20);
+  const [run, setRun] = useState(false);
   const [startGame, setStartGame] = useState(false);
+  const [openMetaMask, setOpenMetaMask] = useState(false);
   const [multiplierCrash, setMultiplierCrash] = useState(0);
+  const [transaction, setTransaction] = useState(false);
 
   const [playerDetails, addPlayerDetails] = useState([]);
+
+  const startTimer = () => {
+    console.log("Run :", run);
+    setRun(true);
+  };
+  const pauseTimer = () => {
+    setRun(false);
+  };
 
   const incrementBetAmount = () => {
     setAmount((a) => a + 1);
   };
 
   const decrementAmount = () => {
+    if (amount <= 1) return;
     setAmount((a) => a - 1);
   };
 
@@ -57,11 +71,13 @@ export default function Home() {
   }
 
   const getBlockHash = async () => {
-    const contractAddress = "0xD7746beC4f562b4c6eD610417858f97175Fe6854";
+    const contractAddress = "0xd13355fe14967853ee5B5847B8C42E06dde46710";
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
     const signer = provider.getSigner();
     const network = await provider.getNetwork();
+
+    if (!accounts[0]) return;
 
     const contract = new ethers.Contract(
       contractAddress,
@@ -74,19 +90,16 @@ export default function Home() {
     const gameHash = await contract.getBlockhash();
     const playerCount = await contract.getPlayerCount();
 
-    console.log("Player Count:", playerCount.toNumber());
-
-    console.log("Game Hash", gameHash);
     const crash = crashPointFromHash(gameHash);
 
-    console.log("Crash", crash);
-    console.log("Multiplier Crash Vlaue", crash);
     setMultiplierCrash(parseFloat(crash));
 
     setGameHash(gameHash);
   };
   const placeBet = async () => {
-    const contractAddress = "0xD7746beC4f562b4c6eD610417858f97175Fe6854";
+    if (amount == 0 || multiplier == 0) return;
+    if (transaction) return;
+    const contractAddress = "0xd13355fe14967853ee5B5847B8C42E06dde46710";
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
     const signer = provider.getSigner();
@@ -98,8 +111,12 @@ export default function Home() {
       signer
     );
 
+    setOpenMetaMask(true);
+
     try {
-      console.log(amount, multiplier, multiplierCrash);
+      setTransaction(true);
+      await getBlockHash();
+      console.log("Mulitplier Value:", multiplierCrash);
       const contractCall = await contract.betAmount(
         amount,
         multiplier,
@@ -108,9 +125,11 @@ export default function Home() {
 
       const res = await contractCall.wait();
 
+      setStartGame(true);
+
       const events = res.events.find((event) => event.event == "returnResult");
 
-      const [_amount, _multiplier, profit] = events.args;
+      const [_amount, _gameMultiplier, _multiplier, profit] = events.args;
 
       addPlayerDetails((oldPlayers) => [
         ...oldPlayers,
@@ -119,17 +138,20 @@ export default function Home() {
           betAmount: _amount.toNumber(),
           multiplier: _multiplier.toNumber(),
           payout: profit.toNumber(),
+          gameMultiplier: multiplierCrash,
         },
       ]);
 
+      setTransaction(false);
       console.log(events.args);
     } catch (err) {
+      setTransaction(false);
       console.log(err);
     }
   };
 
   const endGame = async () => {
-    const contractAddress = "0xD7746beC4f562b4c6eD610417858f97175Fe6854";
+    const contractAddress = "0xd13355fe14967853ee5B5847B8C42E06dde46710";
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
     const signer = provider.getSigner();
@@ -151,7 +173,7 @@ export default function Home() {
   };
 
   const getGameResult = async () => {
-    const contractAddress = "0xD7746beC4f562b4c6eD610417858f97175Fe6854";
+    const contractAddress = "0xd13355fe14967853ee5B5847B8C42E06dde46710";
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
     const signer = provider.getSigner();
@@ -173,89 +195,100 @@ export default function Home() {
     }
   };
 
-  useEffect(() => {
-    getBlockHash();
-    const gameStartInternal = setInterval(() => {
-      setStartGame((c) => !c);
-      getBlockHash();
-    }, 10000);
+  // useEffect(() => {
+  //   let interval;
+  //   if (run === true) {
+  //     interval = setInterval(() => {
+  //       setSeconds((seconds) => seconds - 1);
+  //     }, 1000);
+  //   }
+  //   return () => clearInterval(interval);
+  // }, [run]);
 
-    return () => {
-      clearInterval(gameStartInternal);
-    };
-  }, []);
+  // useEffect(() => {
+  //   if (seconds <= 0) {
+  //     setSeconds(20);
+  //     setRun(false);
+  //   }
+  // }, [seconds]);
+
   return (
     <div>
       <Header />
-      <MultiPlierHistory />
-      <GameSpace startgame={startGame} multiplier={multiplierCrash} />
-      <div className="px-10">
-        <div className="flex">
-          <div className="border-2 w-96 border-yellow-400 px-3 py-3 rounded-md flex flex-col">
-            <span className="font-VT323 text-gray-300">Amount</span>
-            <input
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="text-white h-10 font-VT323 outline-none bg-transparent px-2 text-2xl"
-              type={"number"}
-            />
-          </div>
-          <div className="border-2 w-96 border-yellow-400 px-3 py-3 rounded-md flex flex-col ml-20">
-            <span className="font-VT323 text-gray-300">Auto Cashout</span>
-            <div className="flex items-center">
-              <span className="font-VT323 text-2xl ml-2">X</span>
+      {/* <MultiPlierHistory /> */}
+      <GameSpace
+        transaction={transaction}
+        startgame={startGame}
+        setRun={setRun}
+        setStartGame={setStartGame}
+        multiplier={multiplierCrash}
+      />
+      <div className="md:px-10">
+        <div className="smb:px-3">
+          <div className="flex md:flex-row smb:flex-col">
+            <div className="border-2 h-20 md:w-96 smb:w-full border-yellow-400 px-3 py-3 rounded-md flex flex-col">
+              <span className="font-VT323 text-gray-300">Amount</span>
               <input
-                onChange={(e) => setMultiplier(e.target.value)}
-                value={multiplier}
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                className="text-white h-10 font-VT323 outline-none bg-transparent px-2 text-2xl"
                 type={"number"}
-                className="text-white h-10 outline-none bg-transparent font-VT323 text-2xl px-2"
               />
             </div>
-          </div>
-        </div>
-        <div className="mt-5 flex">
-          <div className="flex items-center w-96 justify-between">
-            <div>
-              <button onClick={minBetAmount} className="button font-VT323">
-                MIN
-              </button>
-            </div>
-            <div>
-              <button onClick={decrementAmount} className="button font-VT323">
-                -
-              </button>
-            </div>
-            <div>
-              <button
-                onClick={incrementBetAmount}
-                className="button font-VT323"
-              >
-                +
-              </button>
-            </div>
-            <div>
-              <button onClick={maxBetAmount} className="button font-VT323">
-                MAX
-              </button>
+            <div className="border-2 h-20 md:w-96 smb:w-full border-yellow-400 px-3 py-3 rounded-md flex flex-col md:mt-0 smb:mt-10 md:ml-20">
+              <span className="font-VT323 text-gray-300">Auto Cashout</span>
+              <div className="flex items-center">
+                <span className="font-VT323 text-2xl ml-2">X</span>
+                <input
+                  onChange={(e) => setMultiplier(e.target.value)}
+                  value={multiplier}
+                  type={"number"}
+                  className="text-white h-10 outline-none bg-transparent font-VT323 text-2xl px-2"
+                />
+              </div>
             </div>
           </div>
-          <div className="ml-20 w-96">
-            {!startGame ? (
-              <button className="button3" onClick={() => placeBet()}>
-                PLACE BET
-              </button>
-            ) : (
-              <button className="button2 cursor-wait">
-                Wait FOR NEXT ROUND
-              </button>
-            )}
+          <div className="mt-5 flex md:flex-row smb:flex-col">
+            <div className="flex items-center w-96 justify-between">
+              <div>
+                <button onClick={minBetAmount} className="button font-VT323">
+                  MIN
+                </button>
+              </div>
+              <div>
+                <button onClick={decrementAmount} className="button font-VT323">
+                  -
+                </button>
+              </div>
+              <div>
+                <button
+                  onClick={incrementBetAmount}
+                  className="button font-VT323"
+                >
+                  +
+                </button>
+              </div>
+              <div>
+                <button onClick={maxBetAmount} className="button font-VT323">
+                  MAX
+                </button>
+              </div>
+            </div>
+            <div className="md:ml-20 md:mt-0 smb:mt-10 w-96">
+              {!startGame ? (
+                <button className="button3" onClick={() => placeBet()}>
+                  PLACE BET
+                </button>
+              ) : (
+                <button className="button2 cursor-wait">
+                  Wait FOR NEXT ROUND
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
         <div className="mt-10">
-          <span className="font-VT323 px-10 border-2 py-5 border-yellow-400">
-            ALL PLAYERS
-          </span>
           <table className="table-body font-VT323">
             <thead className="text-gray-600">
               <tr>
@@ -263,16 +296,23 @@ export default function Home() {
                 <th>Bet Amount</th>
                 <th>Multiplier</th>
                 <th>Payout</th>
+                <th>Crsh</th>
               </tr>
             </thead>
             <tbody>
-              {playerDetails.map((player) => {
+              {playerDetails.map((player, index) => {
                 return (
-                  <tr>
+                  <tr
+                    className={
+                      player.payout >= 1 ? `text-green-300` : `text-white`
+                    }
+                    key={index}
+                  >
                     <td>{player.player}</td>
                     <td>{player.betAmount} SHM</td>
                     <td>x{player.multiplier}</td>
                     <td>{player.payout} SHM</td>
+                    <td>x{player.gameMultiplier}</td>
                   </tr>
                 );
               })}

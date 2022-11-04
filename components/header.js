@@ -3,6 +3,7 @@ import { Fragment, useState, useEffect } from "react";
 import Image from "next/image";
 import { ethers } from "ethers";
 import { Switch } from "@headlessui/react";
+import { ProfileIcon, MenuIcon, SettingsIcon } from "../components/icons";
 import ContractAbi from "../artifacts/contracts/Spaceshot.sol/Spaceshot.json";
 
 const Header = () => {
@@ -32,38 +33,13 @@ const Header = () => {
     setWalletAddress(accounts[0]);
   };
 
-  const getBalance = async () => {
-    const contractAddress = "0xD7746beC4f562b4c6eD610417858f97175Fe6854";
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const accounts = await provider.listAccounts();
-    const signer = provider.getSigner();
-    const network = await provider.getNetwork();
-
-    const contract = new ethers.Contract(
-      contractAddress,
-      ContractAbi.abi,
-      signer
-    );
-
-    try {
-      const accountBalance = await contract.getBalance(accounts[0]);
-      const gameBalance = await contract.getGameBalance();
-      console.log("Game Balance", ethers.utils.formatEther(gameBalance));
-      setAccountBalance(ethers.utils.formatEther(accountBalance));
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
   const DepositAmount = async () => {
     console.log("Deposit Amount", depositAmount);
-    const contractAddress = "0xD7746beC4f562b4c6eD610417858f97175Fe6854";
+    const contractAddress = "0xd13355fe14967853ee5B5847B8C42E06dde46710";
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
     const signer = provider.getSigner();
     const network = await provider.getNetwork();
-
-    console.log("Call Game Status");
 
     const contract = new ethers.Contract(
       contractAddress,
@@ -81,18 +57,29 @@ const Header = () => {
   };
 
   const checkAccounts = async () => {
+    const contractAddress = "0xd13355fe14967853ee5B5847B8C42E06dde46710";
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
+    const signer = provider.getSigner();
+    const network = await provider.getNetwork();
 
     if (!accounts[0]) {
-      loginWithMetaMask();
+      setWalletAddress("");
     } else {
+      const contract = new ethers.Contract(
+        contractAddress,
+        ContractAbi.abi,
+        signer
+      );
+
+      const balance = await contract.getBalance(accounts[0]);
+      setAccountBalance(Number(balance).toString());
       setWalletAddress(accounts[0]);
     }
   };
 
   const withdraw = async () => {
-    const contractAddress = "0xD7746beC4f562b4c6eD610417858f97175Fe6854";
+    const contractAddress = "0xd13355fe14967853ee5B5847B8C42E06dde46710";
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
     const signer = provider.getSigner();
@@ -137,23 +124,28 @@ const Header = () => {
 
   useEffect(() => {
     checkAccounts();
-    getBalance();
   }, []);
 
   return (
-    <div className="h-24 px-10 flex items-center justify-between">
-      <div className="mr-56">
-        <h1 className="text-yellow-400 text-3xl">SPACESHOT</h1>
+    <div className="h-24 smb:px-5 md:px-10 flex items-center justify-between">
+      <div className="smb:mr-10">
+        <h1 className="text-yellow-400 font-VT323 text-5xl">SPACESHOT</h1>
       </div>
-      <div className="w-64 flex items-center justify-around">
-        <button onClick={() => OpenProfileModal()}>
-          <Image src={"/profile.svg"} width={40} height={40} />
+      <div className="md:w-64 smb:w-96 flex items-center justify-around">
+        <button className="md:w-10 md:h-10 " onClick={() => OpenProfileModal()}>
+          <ProfileIcon />
         </button>
-        <button onClick={() => OpenSettingsModal(true)}>
-          <Image src={"/settingsicon.svg"} width={40} height={40} />
+        <button
+          className="md:w-10 md:h-10 "
+          onClick={() => OpenSettingsModal(true)}
+        >
+          <SettingsIcon />
         </button>
-        <button onClick={() => openMenuOptionModal()}>
-          <Image src={"/menuicon.svg"} width={40} height={40} />
+        <button
+          className="md:w-10 md:h-10 "
+          onClick={() => openMenuOptionModal()}
+        >
+          <MenuIcon />
         </button>
       </div>
 
@@ -340,44 +332,52 @@ const Header = () => {
                 leaveTo="opacity-0 scale-95"
               >
                 <Dialog.Panel className="bg-gray-900 transform overflow-hidden rounded-sm p-6 text-left align-middle shadow-xl transition-all">
-                  <div>
-                    <h1 className="font-VT323 text-3xl">
-                      Wallet Address : {walletAddress}
-                    </h1>
-                    <div className="mt-3">
-                      <input
-                        value={depositAmount}
-                        onChange={(e) => setDepositAmount(e.target.value)}
-                        placeholder="SHM"
-                        type={"number"}
-                        className="border-2 bg-gray-900 h-12 border-yellow-400 rounded-sm outline-none px-3"
-                      />
-                      <button
-                        onClick={() => DepositAmount()}
-                        className="font-VT323 text-2xl px-9 ml-3 bg-yellow-400 h-12"
-                      >
-                        DEPOSIT
+                  {walletAddress ? (
+                    <div>
+                      <h1 className="font-VT323 text-3xl">
+                        Wallet Address : {walletAddress}
+                      </h1>
+                      <div className="mt-3">
+                        <input
+                          value={depositAmount}
+                          onChange={(e) => setDepositAmount(e.target.value)}
+                          placeholder="SHM"
+                          type={"number"}
+                          className="border-2 bg-gray-900 h-12 border-yellow-400 rounded-sm outline-none px-3"
+                        />
+                        <button
+                          onClick={() => DepositAmount()}
+                          className="font-VT323 text-2xl px-9 ml-3 bg-yellow-400 h-12"
+                        >
+                          DEPOSIT
+                        </button>
+                      </div>
+                      <div className="mt-3">
+                        <input
+                          value={withdrawAmount}
+                          onChange={(e) => setWithdrawAmount(e.target.value)}
+                          placeholder="SHM"
+                          type={"number"}
+                          className="border-2 bg-gray-900 h-12 border-yellow-400 rounded-sm outline-none px-3"
+                        />
+                        <button
+                          onClick={() => withdraw()}
+                          className="font-VT323 text-2xl px-9 ml-3 bg-yellow-400 h-12"
+                        >
+                          WITHDRAW
+                        </button>
+                      </div>
+                      <h1 className="font-VT323 text-3xl mt-3">
+                        Balance : {accountBalace} SHM
+                      </h1>
+                    </div>
+                  ) : (
+                    <div>
+                      <button onClick={loginWithMetaMask}>
+                        Connect Wallet
                       </button>
                     </div>
-                    <div className="mt-3">
-                      <input
-                        value={withdrawAmount}
-                        onChange={(e) => setWithdrawAmount(e.target.value)}
-                        placeholder="SHM"
-                        type={"number"}
-                        className="border-2 bg-gray-900 h-12 border-yellow-400 rounded-sm outline-none px-3"
-                      />
-                      <button
-                        onClick={() => withdraw()}
-                        className="font-VT323 text-2xl px-9 ml-3 bg-yellow-400 h-12"
-                      >
-                        WITHDRAW
-                      </button>
-                    </div>
-                    <h1 className="font-VT323 text-3xl mt-3">
-                      Balance : {accountBalace} SHM
-                    </h1>
-                  </div>
+                  )}
                 </Dialog.Panel>
               </Transition.Child>
             </div>

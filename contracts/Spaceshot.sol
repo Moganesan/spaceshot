@@ -29,7 +29,12 @@ contract Spaceshot {
 
     event gameStarted(uint256 _startingTime, uint256 _endingTime);
 
-    event returnResult(uint256 _amount, uint256 _multiplier, uint256 profit);
+    event returnResult(
+        uint256 _amount,
+        uint256 _gameMultiplier,
+        uint256 _multiplier,
+        uint256 profit
+    );
 
     mapping(uint256 => playerDetails) public currentPlayers;
     mapping(uint256 => GameResult) public gameResult;
@@ -93,10 +98,15 @@ contract Spaceshot {
         if (multiplier <= gameMultiplier) {
             uint256 profit = amount * multiplier;
             balances[msg.sender] += profit * (1 ether);
-            emit returnResult(amount, multiplier, amount * multiplier);
+            emit returnResult(
+                amount,
+                gameMultiplier,
+                multiplier,
+                amount * multiplier
+            );
         } else {
             balances[msg.sender] -= amount * (1 ether);
-            emit returnResult(amount, multiplier, 0);
+            emit returnResult(amount, gameMultiplier, multiplier, 0);
         }
     }
 

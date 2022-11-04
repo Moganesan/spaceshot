@@ -5,21 +5,28 @@ import { ethers } from "ethers";
 import RocketAnimation from "../public/rocketAnimation.json";
 import Lottie from "lottie-react";
 import ContractAbi from "../artifacts/contracts/Spaceshot.sol/Spaceshot.json";
+import { data } from "autoprefixer";
 
-const GameSpace = ({ multiplier, startgame }) => {
+const GameSpace = ({
+  multiplier,
+  startgame,
+  timer,
+  setStartGame,
+  transaction,
+}) => {
   const animationRef = useRef(null);
   const multiplierRef = useRef(null);
   const timerRef = useRef(null);
-  const [timer, setTimer] = useState(10);
 
   const [multiplierValue, setMultiplier] = useState(0);
 
   const [currentMultiplier, setCurrentMultiplier] = useState(0);
 
   console.log("Game Multiplier Value");
+  console.log("Multiplier:", multiplier);
 
   const checkGameStatus = async () => {
-    const contractAddress = "0xD7746beC4f562b4c6eD610417858f97175Fe6854";
+    const contractAddress = "0xd13355fe14967853ee5B5847B8C42E06dde46710";
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
     const signer = provider.getSigner();
@@ -42,15 +49,7 @@ const GameSpace = ({ multiplier, startgame }) => {
 
   useEffect(() => {
     setMultiplier(multiplier);
-    if (!startgame) {
-      timerRef.current = anime({
-        targets: ".timer-text",
-        textContent: 0,
-        easing: "easeInOutQuad",
-        round: 1,
-        duration: 10000,
-      });
-    } else {
+    if (startgame) {
       animationRef.current = anime({
         targets: ".spacecraft",
         translateX: 720,
@@ -78,9 +77,12 @@ const GameSpace = ({ multiplier, startgame }) => {
       multiplierRef.current = anime({
         targets: ".multiplier-text",
         textContent: multiplier,
-        endDelay: 20000,
+        endDelay: 10000,
         easing: "easeInOutQuad",
         round: 2,
+        complete: () => {
+          setStartGame(false);
+        },
         duration: 10000,
       });
     }
@@ -91,7 +93,7 @@ const GameSpace = ({ multiplier, startgame }) => {
       {startgame ? (
         <div
           style={{ height: 500 }}
-          className="border-2 text-yellow-400 relative h-96 mx-10 my-10  overflow-hidden rounded-lg border-yellow-400"
+          className="border-2 text-yellow-400 relative h-96 smb:mx-4 md:mx-10 my-10  overflow-hidden rounded-lg border-yellow-400"
         >
           <video autoPlay="true" loop="true" muted id="gamebackground">
             <source src="/bge.mp4" type="video/mp4" />
@@ -110,14 +112,16 @@ const GameSpace = ({ multiplier, startgame }) => {
       ) : (
         <div
           style={{ height: 500 }}
-          className="border-2 text-yellow-400 relative h-96 mx-10 my-10 flex items-center justify-center  overflow-hidden rounded-lg border-yellow-400"
+          className="border-2 text-yellow-400 relative h-96 smb:px-3 md:mx-10 my-10 flex items-center justify-center flex-col  overflow-hidden rounded-lg border-yellow-400"
         >
           <div className="w-48 h-48">
             <Lottie animationData={RocketAnimation} loop={true} />
-            <span className="text-green-400 font-VT323 text-2xl font-bold">
-              Round starts in <span className="timer-text">{timer}</span>
-            </span>
           </div>
+          <span className="text-green-400 font-VT323 text-2xl font-bold">
+            {transaction
+              ? "wait for completing transaction"
+              : "Place bet for starting new game"}
+          </span>
         </div>
       )}
     </>

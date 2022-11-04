@@ -53,22 +53,21 @@ input[type=number] {
 }
 
 .table-body th{
-    padding: 12px 50px;
+    padding: 12px 10px;
 }
 .table-body td{
     padding: 12px 15px;
 }
 
 .table-body tr{
-    background-color: #171C25;
-    color: white;
+    background-color: #171C25;  
     text-align: left;
     font-weight: bold;
 }
 
-tr:nth-of-type(even){
+/* tr:nth-of-type(even){
    color: #06FF3D;
-}
+} */
   
 .spacecraft{
     margin-top:140px;
