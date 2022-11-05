@@ -1,4 +1,8 @@
+pragma solidity ^0.8.0;
+import "./ABDKMath.sol";
+
 contract Spaceshot {
+    using ABDKMath64x64 for uint256;
     mapping(address => uint256) public balances;
     uint256 public playersCount;
     uint256 public transactions;
@@ -124,12 +128,6 @@ contract Spaceshot {
 
     function getTimeStamp() public view returns (uint256) {
         return block.timestamp;
-    }
-
-    function getBlockhash() public view returns (bytes32) {
-        uint256 blockNumber = block.number;
-        bytes32 blockHash = blockhash(blockNumber - 1);
-        return blockHash;
     }
 
     function startNewGame() public {

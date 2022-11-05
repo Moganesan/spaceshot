@@ -131,10 +131,20 @@ const Header = () => {
       <div className="smb:mr-10">
         <h1 className="text-yellow-400 font-VT323 text-5xl">SPACESHOT</h1>
       </div>
-      <div className="md:w-64 smb:w-96 flex items-center justify-around">
-        <button className="md:w-10 md:h-10 " onClick={() => OpenProfileModal()}>
-          <ProfileIcon />
-        </button>
+      <div className="md:w-96 smb:w-96 flex items-center justify-around">
+        {walletAddress ? (
+          <button
+            className="md:w-10 md:h-10 "
+            onClick={() => OpenProfileModal()}
+          >
+            <ProfileIcon />
+          </button>
+        ) : (
+          <button className="button4" onClick={loginWithMetaMask}>
+            Connect Wallet
+          </button>
+        )}
+
         <button
           className="md:w-10 md:h-10 "
           onClick={() => OpenSettingsModal(true)}
@@ -176,11 +186,13 @@ const Header = () => {
               >
                 <Dialog.Panel className="bg-gray-900 transform overflow-hidden rounded-sm p-6 text-left align-middle shadow-xl transition-all">
                   <div>
-                    <div className="flex items-center w-96 justify-between">
+                    <div className="flex items-center md:w-96 justify-between">
                       <div>
                         <Image src={"/soundicon.svg"} width={60} height={60} />
                       </div>
-                      <span className="font-VT323 text-5xl ml-10">Sound</span>
+                      <span className="font-VT323 md:text-5xl smb:text-2xl ml-10">
+                        Sound
+                      </span>
                       <Switch
                         checked={enableSound}
                         onChange={setEnableSound}
@@ -199,11 +211,11 @@ const Header = () => {
                         />
                       </Switch>
                     </div>
-                    <div className="flex mt-10 items-center w-96 justify-between">
+                    <div className="flex mt-10 items-center md:w-96 justify-between">
                       <div>
                         <Image src={"/playicon.svg"} width={60} height={60} />
                       </div>
-                      <span className="font-VT323 text-5xl ml-10">
+                      <span className="font-VT323 smb:text-2xl md:text-5xl ml-10">
                         Animation
                       </span>
 
@@ -226,11 +238,11 @@ const Header = () => {
                       </Switch>
                     </div>
 
-                    <div className="flex mt-10 items-center w-96 justify-between">
+                    <div className="flex mt-10 items-center md:w-96 justify-between">
                       <div>
                         <Image src={"/chaticon.svg"} width={60} height={60} />
                       </div>
-                      <span className="font-VT323 ml-10 text-5xl">
+                      <span className="font-VT323 ml-10 smb:text-2xl md:text-5xl">
                         Chat Sound
                       </span>
 

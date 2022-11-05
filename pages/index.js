@@ -5,21 +5,30 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { ethers } from "ethers";
 import crypto from "crypto";
 import GameSpace from "../components/gamespace";
+import WaitingSpace from "../components/waitingSpace";
 import MultiPlierHistory from "../components/multiplierHistory";
+import {
+  startGame,
+  stopGame,
+  setMultiplier,
+  resetMultiplier,
+} from "../store/features/uiSlice";
+import { useDispatch, useSelector } from "react-redux";
 import ContractAbi from "../artifacts/contracts/Spaceshot.sol/Spaceshot.json";
 import IntervalTimer from "../components/IntervalTimer";
 
 export default function Home() {
   const [amount, setAmount] = useState(0);
-  const [multiplier, setMultiplier] = useState(0);
-  const [gameHash, setGameHash] = useState("");
+  const [multiplier, SetMultiplier] = useState(0);
   const [clientSeed, setClientSeed] = useState("");
   const [seconds, setSeconds] = useState(20);
   const [run, setRun] = useState(false);
-  const [startGame, setStartGame] = useState(false);
   const [openMetaMask, setOpenMetaMask] = useState(false);
-  const [multiplierCrash, setMultiplierCrash] = useState(0);
+  const gameState = useSelector((state) => state.ui["startGame"]);
   const [transaction, setTransaction] = useState(false);
+  const [multiplierCrash, setMultiplierCrash] = useState("");
+
+  const dispatch = useDispatch();
 
   const [playerDetails, addPlayerDetails] = useState([]);
 
@@ -74,31 +83,20 @@ export default function Home() {
     const contractAddress = "0xd13355fe14967853ee5B5847B8C42E06dde46710";
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
-    const signer = provider.getSigner();
-    const network = await provider.getNetwork();
 
     if (!accounts[0]) return;
 
-    const contract = new ethers.Contract(
-      contractAddress,
-      ContractAbi.abi,
-      signer
-    );
-
     setClientSeed(contractAddress);
-
-    const gameHash = await contract.getBlockhash();
-    const playerCount = await contract.getPlayerCount();
+    const gameHash = (await provider.getBlock("latest")).hash;
 
     const crash = crashPointFromHash(gameHash);
-
-    setMultiplierCrash(parseFloat(crash));
-
-    setGameHash(gameHash);
+    setMultiplierCrash(crash);
+    return crash;
   };
   const placeBet = async () => {
     if (amount == 0 || multiplier == 0) return;
     if (transaction) return;
+    const multiplierCrash = await getBlockHash();
     const contractAddress = "0xd13355fe14967853ee5B5847B8C42E06dde46710";
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
@@ -115,17 +113,17 @@ export default function Home() {
 
     try {
       setTransaction(true);
-      await getBlockHash();
-      console.log("Mulitplier Value:", multiplierCrash);
+
+      console.log("Multiplier:", multiplier);
+      console.log("Multiplier Crash", multiplierCrash);
+
       const contractCall = await contract.betAmount(
         amount,
         multiplier,
-        parseInt(multiplierCrash)
+        multiplierCrash
       );
 
       const res = await contractCall.wait();
-
-      setStartGame(true);
 
       const events = res.events.find((event) => event.event == "returnResult");
 
@@ -143,9 +141,10 @@ export default function Home() {
       ]);
 
       setTransaction(false);
-      console.log(events.args);
+      dispatch(startGame());
     } catch (err) {
       setTransaction(false);
+      setMultiplier(0);
       console.log(err);
     }
   };
@@ -156,8 +155,6 @@ export default function Home() {
     const accounts = await provider.listAccounts();
     const signer = provider.getSigner();
     const network = await provider.getNetwork();
-
-    console.log("Call Game Status");
 
     const contract = new ethers.Contract(
       contractAddress,
@@ -179,8 +176,6 @@ export default function Home() {
     const signer = provider.getSigner();
     const network = await provider.getNetwork();
 
-    console.log("Call Game Status");
-
     const contract = new ethers.Contract(
       contractAddress,
       ContractAbi.abi,
@@ -189,7 +184,6 @@ export default function Home() {
 
     try {
       const result = await contract.getGameResult();
-      console.log("Game Result:", result);
     } catch (err) {
       console.log(err);
     }
@@ -215,14 +209,18 @@ export default function Home() {
   return (
     <div>
       <Header />
+      {multiplierCrash}
       {/* <MultiPlierHistory /> */}
-      <GameSpace
-        transaction={transaction}
-        startgame={startGame}
-        setRun={setRun}
-        setStartGame={setStartGame}
-        multiplier={multiplierCrash}
-      />
+      {gameState ? (
+        <GameSpace
+          transaction={transaction}
+          setRun={setRun}
+          multiplier={multiplierCrash}
+        />
+      ) : (
+        <WaitingSpace transaction={transaction} />
+      )}
+
       <div className="md:px-10">
         <div className="smb:px-3">
           <div className="flex md:flex-row smb:flex-col">
@@ -240,7 +238,7 @@ export default function Home() {
               <div className="flex items-center">
                 <span className="font-VT323 text-2xl ml-2">X</span>
                 <input
-                  onChange={(e) => setMultiplier(e.target.value)}
+                  onChange={(e) => SetMultiplier(e.target.value)}
                   value={multiplier}
                   type={"number"}
                   className="text-white h-10 outline-none bg-transparent font-VT323 text-2xl px-2"
@@ -275,7 +273,7 @@ export default function Home() {
               </div>
             </div>
             <div className="md:ml-20 md:mt-0 smb:mt-10 w-96">
-              {!startGame ? (
+              {!gameState ? (
                 <button className="button3" onClick={() => placeBet()}>
                   PLACE BET
                 </button>
