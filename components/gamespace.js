@@ -5,10 +5,13 @@ import { ethers } from "ethers";
 import Lottie from "lottie-react";
 import ContractAbi from "../artifacts/contracts/Spaceshot.sol/Spaceshot.json";
 import { useDispatch, useSelector } from "react-redux";
+import { stopGame } from "../store/features/uiSlice";
 import { data } from "autoprefixer";
 
 const GameSpace = ({ transaction, multiplier }) => {
   const animationRef = useRef(null);
+
+  const dispatch = useDispatch();
 
   const [currentMultiplier, setCurrentMultiplier] = useState(0);
 
@@ -69,6 +72,9 @@ const GameSpace = ({ transaction, multiplier }) => {
       if (multiplier <= currentMultiplier) {
         setCurrentMultiplier((m) => multiplier - 0.1);
         clearInterval(interval);
+        setTimeout(() => {
+          dispatch(stopGame());
+        }, 1000);
       }
       setCurrentMultiplier((m) => m + 0.1);
     }, 500);

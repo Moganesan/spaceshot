@@ -73,7 +73,7 @@ const Header = () => {
       );
 
       const balance = await contract.getBalance(accounts[0]);
-      setAccountBalance(Number(balance).toString());
+      setAccountBalance(ethers.utils.formatEther(balance));
       setWalletAddress(accounts[0]);
     }
   };

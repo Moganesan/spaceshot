@@ -2,7 +2,7 @@ import Head from "next/head";
 import Image from "next/image";
 import Header from "../components/header";
 import { useEffect, useRef, useState, useCallback } from "react";
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import crypto from "crypto";
 import GameSpace from "../components/gamespace";
 import WaitingSpace from "../components/waitingSpace";
@@ -115,12 +115,15 @@ export default function Home() {
       setTransaction(true);
 
       console.log("Multiplier:", multiplier);
-      console.log("Multiplier Crash", multiplierCrash);
+      console.log(
+        "Multiplier Crash",
+        Number(ethers.utils.parseUnits(multiplierCrash.toString()))
+      );
 
       const contractCall = await contract.betAmount(
-        amount,
-        multiplier,
-        multiplierCrash
+        ethers.utils.parseEther(amount),
+        ethers.utils.parseUnits(multiplier.toString()),
+        ethers.utils.parseUnits(multiplierCrash.toString())
       );
 
       const res = await contractCall.wait();
@@ -133,10 +136,10 @@ export default function Home() {
         ...oldPlayers,
         {
           player: accounts[0],
-          betAmount: _amount.toNumber(),
-          multiplier: _multiplier.toNumber(),
-          payout: profit.toNumber(),
-          gameMultiplier: multiplierCrash,
+          betAmount: ethers.utils.formatEther(_amount),
+          multiplier: ethers.utils.formatUnits(_multiplier),
+          payout: ethers.utils.formatUnits(profit),
+          gameMultiplier: ethers.utils.formatUnits(_gameMultiplier),
         },
       ]);
 
@@ -297,24 +300,26 @@ export default function Home() {
                 <th>Crsh</th>
               </tr>
             </thead>
-            <tbody>
-              {playerDetails.map((player, index) => {
-                return (
-                  <tr
-                    className={
-                      player.payout >= 1 ? `text-green-300` : `text-white`
-                    }
-                    key={index}
-                  >
-                    <td>{player.player}</td>
-                    <td>{player.betAmount} SHM</td>
-                    <td>x{player.multiplier}</td>
-                    <td>{player.payout} SHM</td>
-                    <td>x{player.gameMultiplier}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
+            {!gameState && (
+              <tbody>
+                {playerDetails.map((player, index) => {
+                  return (
+                    <tr
+                      className={
+                        player.payout >= 1 ? `text-green-300` : `text-white`
+                      }
+                      key={index}
+                    >
+                      <td>{player.player}</td>
+                      <td>{player.betAmount} SHM</td>
+                      <td>x{player.multiplier}</td>
+                      <td>{player.payout} SHM</td>
+                      <td>x{player.gameMultiplier}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            )}
           </table>
         </div>
 
