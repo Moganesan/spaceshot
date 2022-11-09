@@ -16,6 +16,14 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import ContractAbi from "../artifacts/contracts/Spaceshot.sol/Spaceshot.json";
 import IntervalTimer from "../components/IntervalTimer";
+import axios from "../config/axios";
+import {
+  MinButton1,
+  MinButton2,
+  AddButton1,
+  AddButton2,
+  MinusButton1,
+} from "../public/gameassets/gameIcons";
 
 export default function Home() {
   const [amount, setAmount] = useState(0);
@@ -80,7 +88,7 @@ export default function Home() {
   }
 
   const getBlockHash = async () => {
-    const contractAddress = "0xd13355fe14967853ee5B5847B8C42E06dde46710";
+    const contractAddress = "0x08536765C2f998697105c892f71eAD092CF8A042";
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
 
@@ -93,11 +101,28 @@ export default function Home() {
     setMultiplierCrash(crash);
     return crash;
   };
+  const getGameBalance = async () => {
+    const contractAddress = "0x08536765C2f998697105c892f71eAD092CF8A042";
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const accounts = await provider.listAccounts();
+    const signer = provider.getSigner();
+    const network = await provider.getNetwork();
+
+    const contract = new ethers.Contract(
+      contractAddress,
+      ContractAbi.abi,
+      signer
+    );
+
+    const gameBalane = await contract.getBalance();
+    console.log("Game Balance", gameBalane);
+  };
   const placeBet = async () => {
+    // getGameBalance();
     if (amount == 0 || multiplier == 0) return;
     if (transaction) return;
     const multiplierCrash = await getBlockHash();
-    const contractAddress = "0xd13355fe14967853ee5B5847B8C42E06dde46710";
+    const contractAddress = "0x08536765C2f998697105c892f71eAD092CF8A042";
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
     const signer = provider.getSigner();
@@ -153,7 +178,7 @@ export default function Home() {
   };
 
   const endGame = async () => {
-    const contractAddress = "0xd13355fe14967853ee5B5847B8C42E06dde46710";
+    const contractAddress = "0xB73117163f2A046dee3644B847bd0D8917698d11";
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
     const signer = provider.getSigner();
@@ -173,7 +198,7 @@ export default function Home() {
   };
 
   const getGameResult = async () => {
-    const contractAddress = "0xd13355fe14967853ee5B5847B8C42E06dde46710";
+    const contractAddress = "0xB73117163f2A046dee3644B847bd0D8917698d11";
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
     const signer = provider.getSigner();
@@ -212,7 +237,6 @@ export default function Home() {
   return (
     <div>
       <Header />
-      {multiplierCrash}
       {/* <MultiPlierHistory /> */}
       {gameState ? (
         <GameSpace
@@ -252,26 +276,31 @@ export default function Home() {
           <div className="mt-5 flex md:flex-row smb:flex-col">
             <div className="flex items-center w-96 justify-between">
               <div>
-                <button onClick={minBetAmount} className="button font-VT323">
-                  MIN
+                <button onClick={minBetAmount} className="relative font-VT323">
+                  <MinButton1 />
+                  <span className="absolute center">MIN</span>
                 </button>
               </div>
               <div>
-                <button onClick={decrementAmount} className="button font-VT323">
-                  -
+                <button
+                  onClick={decrementAmount}
+                  className="relative font-VT323"
+                >
+                  <MinusButton1 />
                 </button>
               </div>
               <div>
                 <button
                   onClick={incrementBetAmount}
-                  className="button font-VT323"
+                  className="relative font-VT323"
                 >
-                  +
+                  <AddButton1 />
                 </button>
               </div>
               <div>
-                <button onClick={maxBetAmount} className="button font-VT323">
-                  MAX
+                <button onClick={maxBetAmount} className="relative font-VT323">
+                  <MinButton1 />
+                  <span className="absolute center">MAX</span>
                 </button>
               </div>
             </div>
@@ -306,7 +335,7 @@ export default function Home() {
                   return (
                     <tr
                       className={
-                        player.payout >= 1 ? `text-green-300` : `text-white`
+                        player.payout >= 1 ? `text-green-300` : `text-red-300`
                       }
                       key={index}
                     >

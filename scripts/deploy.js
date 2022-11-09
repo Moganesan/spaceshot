@@ -16,13 +16,7 @@ async function main() {
 
   await deploy.deployed();
 
-  await deploy.startNewGame();
-
-  const gameStatus = await deploy.checkGameStatus();
-
-  console.log("Game Status", gameStatus);
-
-  console.log("Contract Address", deploy.address);
+  console.log("Contract Address:", deploy.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
