@@ -4,6 +4,7 @@ import Image from "next/image";
 import { ethers } from "ethers";
 import { Switch } from "@headlessui/react";
 import { ProfileIcon, MenuIcon, SettingsIcon } from "../components/icons";
+import axios from "../config/axios";
 import ContractAbi from "../artifacts/contracts/Spaceshot.sol/Spaceshot.json";
 
 const Header = () => {
@@ -29,6 +30,12 @@ const Header = () => {
     const accounts = await window.ethereum.request({
       method: "eth_requestAccounts",
     });
+
+    try {
+      const res = await axios.post("/login", { walletAddress: accounts[0] });
+
+      console.log(res);
+    } catch (err) {}
 
     setWalletAddress(accounts[0]);
   };
