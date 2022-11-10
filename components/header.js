@@ -35,7 +35,7 @@ const Header = () => {
 
   const DepositAmount = async () => {
     console.log("Deposit Amount", depositAmount);
-    const contractAddress = "0x08536765C2f998697105c892f71eAD092CF8A042";
+    const contractAddress = "0xB10A38A3f18D5A0AB6E9fd571f3B50B258cb7898";
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
     const signer = provider.getSigner();
@@ -57,7 +57,7 @@ const Header = () => {
   };
 
   const checkAccounts = async () => {
-    const contractAddress = "0x08536765C2f998697105c892f71eAD092CF8A042";
+    const contractAddress = "0xB10A38A3f18D5A0AB6E9fd571f3B50B258cb7898";
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
     const signer = provider.getSigner();
@@ -72,6 +72,8 @@ const Header = () => {
         signer
       );
 
+      console.log("Wallet Address:", accounts[0]);
+
       const balance = await contract.getBalance(accounts[0]);
       setAccountBalance(ethers.utils.formatEther(balance));
       setWalletAddress(accounts[0]);
@@ -79,7 +81,7 @@ const Header = () => {
   };
 
   const withdraw = async () => {
-    const contractAddress = "0x08536765C2f998697105c892f71eAD092CF8A042";
+    const contractAddress = "0xB10A38A3f18D5A0AB6E9fd571f3B50B258cb7898";
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
     const signer = provider.getSigner();

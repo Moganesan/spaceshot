@@ -16,6 +16,12 @@ async function main() {
 
   await deploy.deployed();
 
+  await deploy.deposit({ value: hre.ethers.utils.parseEther("2") });
+
+  const balance = await deploy.getBalance(deployer.address);
+
+  console.log("Account Balance:", hre.ethers.utils.formatEther(balance));
+
   console.log("Contract Address:", deploy.address);
 }
 

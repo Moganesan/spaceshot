@@ -88,7 +88,7 @@ export default function Home() {
   }
 
   const getBlockHash = async () => {
-    const contractAddress = "0x08536765C2f998697105c892f71eAD092CF8A042";
+    const contractAddress = "0xB10A38A3f18D5A0AB6E9fd571f3B50B258cb7898";
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
 
@@ -102,7 +102,7 @@ export default function Home() {
     return crash;
   };
   const getGameBalance = async () => {
-    const contractAddress = "0x08536765C2f998697105c892f71eAD092CF8A042";
+    const contractAddress = "0xB10A38A3f18D5A0AB6E9fd571f3B50B258cb7898";
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
     const signer = provider.getSigner();
@@ -114,7 +114,7 @@ export default function Home() {
       signer
     );
 
-    const gameBalane = await contract.getBalance();
+    const gameBalane = await contract.getBalance(accounts[0]);
     console.log("Game Balance", gameBalane);
   };
   const placeBet = async () => {
@@ -122,7 +122,7 @@ export default function Home() {
     if (amount == 0 || multiplier == 0) return;
     if (transaction) return;
     const multiplierCrash = await getBlockHash();
-    const contractAddress = "0x08536765C2f998697105c892f71eAD092CF8A042";
+    const contractAddress = "0xB10A38A3f18D5A0AB6E9fd571f3B50B258cb7898";
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
     const signer = provider.getSigner();
@@ -178,7 +178,7 @@ export default function Home() {
   };
 
   const endGame = async () => {
-    const contractAddress = "0xB73117163f2A046dee3644B847bd0D8917698d11";
+    const contractAddress = "0xB10A38A3f18D5A0AB6E9fd571f3B50B258cb7898";
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
     const signer = provider.getSigner();
@@ -198,7 +198,7 @@ export default function Home() {
   };
 
   const getGameResult = async () => {
-    const contractAddress = "0xB73117163f2A046dee3644B847bd0D8917698d11";
+    const contractAddress = "0xB10A38A3f18D5A0AB6E9fd571f3B50B258cb7898";
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
     const signer = provider.getSigner();

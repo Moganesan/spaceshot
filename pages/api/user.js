@@ -1,19 +1,17 @@
-import firebase from "../../config/firebase-admin";
-
+import prisma from "../../config/prisma";
 export default async function userhandler(req, res) {
   const method = req.method;
   console.log("Response from user route");
   if (method == "POST") {
-    const { walletAddress, balane } = req.body;
+    const { walletAddress, balance } = req.body;
     try {
-      await firebase
-        .firestore()
-        .collection("players")
-        .doc(walletAddress.trim())
-        .create({
-          balance: balane,
-        });
-      return res.status(200).send({
+      await prisma.players.create({
+        data: {
+          walletAddress: walletAddress,
+          balance: parseInt(balance),
+        },
+      });
+      res.status(200).send({
         status: 200,
         message: "New User Created Successfully",
       });

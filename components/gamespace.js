@@ -18,7 +18,7 @@ const GameSpace = ({ transaction, multiplier }) => {
   const gameState = useSelector((state) => state.ui["startGame"]);
 
   const checkGameStatus = async () => {
-    const contractAddress = "0x08536765C2f998697105c892f71eAD092CF8A042";
+    const contractAddress = "0xB10A38A3f18D5A0AB6E9fd571f3B50B258cb7898";
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
     const signer = provider.getSigner();
