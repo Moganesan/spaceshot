@@ -1,0 +1,33 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model players {
+  id            String     @id @default(cuid())
+  walletAddress String     @unique
+  balance       Int
+  sessions      sessions[]
+}
+
+model contracts {
+  id            Int      @id @default(autoincrement())
+  walletAddress String
+  deployedAt    DateTime
+  balance       Int
+}
+
+model sessions {
+  id        Int      @id @default(autoincrement())
+  playeer   players  @relation(fields: [pid], references: [id])
+  pid       String   @unique
+  createdAt DateTime @default(now())
+  token     String
+}
