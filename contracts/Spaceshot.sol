@@ -58,17 +58,15 @@ contract Spaceshot {
     }
 
     function betAmount(
+        address player,
         uint256 amount,
         uint256 multiplier,
         uint256 gameMultiplier
     ) public {
-        require(
-            balances[msg.sender] >= amount * (1 ether),
-            "Insuffecient Funds"
-        );
+        require(balances[player] >= amount, "Insuffecient Funds");
         if (multiplier <= gameMultiplier) {
             uint256 profit = amount * multiplier;
-            balances[msg.sender] += profit * (1 ether);
+            balances[player] += profit;
             emit returnResult(
                 amount,
                 gameMultiplier,
@@ -76,7 +74,7 @@ contract Spaceshot {
                 amount * multiplier
             );
         } else {
-            balances[msg.sender] -= amount * (1 ether);
+            balances[player] -= amount;
             emit returnResult(amount, gameMultiplier, multiplier, 0);
         }
     }

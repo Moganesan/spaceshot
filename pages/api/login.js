@@ -1,8 +1,17 @@
 import prisma from "../../config/prisma";
 import jwt from "jsonwebtoken";
+import { setCookie } from "cookies-next";
 
 export default async function login(req, res) {
   const { walletAddress } = req.body;
+
+  const method = req.method;
+  if (method !== "POST")
+    return res.status(400).send({
+      status: 404,
+      message: "Invalid Request",
+    });
+  console.log(walletAddress);
 
   if (!walletAddress)
     return res.status(401).json({
@@ -70,7 +79,7 @@ export default async function login(req, res) {
   if (checkSession)
     await prisma.sessions.delete({
       where: {
-        uid: checkUser.id,
+        pid: checkUser.id,
       },
     });
 

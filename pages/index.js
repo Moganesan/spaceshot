@@ -16,7 +16,6 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import ContractAbi from "../artifacts/contracts/Spaceshot.sol/Spaceshot.json";
 import IntervalTimer from "../components/IntervalTimer";
-import axios from "../config/axios";
 import {
   MinButton1,
   MinButton2,
@@ -24,8 +23,10 @@ import {
   AddButton2,
   MinusButton1,
 } from "../public/gameassets/gameIcons";
+import jwt from "jsonwebtoken";
+import axios from "../config/axios";
 
-export default function Home() {
+export default function Home({ auth, walletAddress }) {
   const [amount, setAmount] = useState(0);
   const [multiplier, SetMultiplier] = useState(0);
   const [clientSeed, setClientSeed] = useState("");
@@ -66,9 +67,11 @@ export default function Home() {
   };
 
   function crashPointFromHash(serverSeed) {
+    const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
+    console.log("Contract Address", contractAddress);
     const hash = crypto
       .createHmac("sha256", serverSeed)
-      .update(clientSeed)
+      .update(contractAddress)
       .digest("hex");
 
     const hs = parseInt(100 / 5); // 5% house edge
@@ -88,7 +91,7 @@ export default function Home() {
   }
 
   const getBlockHash = async () => {
-    const contractAddress = "0xB10A38A3f18D5A0AB6E9fd571f3B50B258cb7898";
+    const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
 
@@ -102,7 +105,7 @@ export default function Home() {
     return crash;
   };
   const getGameBalance = async () => {
-    const contractAddress = "0xB10A38A3f18D5A0AB6E9fd571f3B50B258cb7898";
+    const contractAddress = "0xd59BAD5EA33514783E3B2822523517e9B95834f6";
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
     const signer = provider.getSigner();
@@ -121,64 +124,33 @@ export default function Home() {
     // getGameBalance();
     if (amount == 0 || multiplier == 0) return;
     if (transaction) return;
+
     const multiplierCrash = await getBlockHash();
-    const contractAddress = "0xB10A38A3f18D5A0AB6E9fd571f3B50B258cb7898";
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const accounts = await provider.listAccounts();
-    const signer = provider.getSigner();
-    const network = await provider.getNetwork();
 
-    const contract = new ethers.Contract(
-      contractAddress,
-      ContractAbi.abi,
-      signer
-    );
+    const res = await axios.post("/betAmount", {
+      amount: amount,
+      multiplier: multiplier,
+      gameMultiplier: multiplierCrash,
+    });
 
-    setOpenMetaMask(true);
+    console.log(res.data);
+    // addPlayerDetails((oldPlayers) => [
+    //   ...oldPlayers,
+    //   {
+    //     player: accounts[0],
+    //     betAmount: ethers.utils.formatEther(_amount),
+    //     multiplier: ethers.utils.formatUnits(_multiplier),
+    //     payout: ethers.utils.formatUnits(profit),
+    //     gameMultiplier: ethers.utils.formatUnits(_gameMultiplier),
+    //   },
+    // ]);
 
-    try {
-      setTransaction(true);
-
-      console.log("Multiplier:", multiplier);
-      console.log(
-        "Multiplier Crash",
-        Number(ethers.utils.parseUnits(multiplierCrash.toString()))
-      );
-
-      const contractCall = await contract.betAmount(
-        ethers.utils.parseEther(amount),
-        ethers.utils.parseUnits(multiplier.toString()),
-        ethers.utils.parseUnits(multiplierCrash.toString())
-      );
-
-      const res = await contractCall.wait();
-
-      const events = res.events.find((event) => event.event == "returnResult");
-
-      const [_amount, _gameMultiplier, _multiplier, profit] = events.args;
-
-      addPlayerDetails((oldPlayers) => [
-        ...oldPlayers,
-        {
-          player: accounts[0],
-          betAmount: ethers.utils.formatEther(_amount),
-          multiplier: ethers.utils.formatUnits(_multiplier),
-          payout: ethers.utils.formatUnits(profit),
-          gameMultiplier: ethers.utils.formatUnits(_gameMultiplier),
-        },
-      ]);
-
-      setTransaction(false);
-      dispatch(startGame());
-    } catch (err) {
-      setTransaction(false);
-      setMultiplier(0);
-      console.log(err);
-    }
+    // setTransaction(false);
+    // dispatch(startGame());
   };
 
   const endGame = async () => {
-    const contractAddress = "0xB10A38A3f18D5A0AB6E9fd571f3B50B258cb7898";
+    const contractAddress = "0xd59BAD5EA33514783E3B2822523517e9B95834f6";
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
     const signer = provider.getSigner();
@@ -198,7 +170,7 @@ export default function Home() {
   };
 
   const getGameResult = async () => {
-    const contractAddress = "0xB10A38A3f18D5A0AB6E9fd571f3B50B258cb7898";
+    const contractAddress = "0xd59BAD5EA33514783E3B2822523517e9B95834f6";
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
     const signer = provider.getSigner();
@@ -234,9 +206,33 @@ export default function Home() {
   //   }
   // }, [seconds]);
 
+  const checkAccounts = async () => {
+    const contractAddress = "0xd59BAD5EA33514783E3B2822523517e9B95834f6";
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const accounts = await provider.listAccounts();
+    const signer = provider.getSigner();
+    const network = await provider.getNetwork();
+
+    if (!accounts[0]) {
+      setWalletAddress("");
+    } else {
+      const contract = new ethers.Contract(
+        contractAddress,
+        ContractAbi.abi,
+        signer
+      );
+
+      console.log("Wallet Address:", accounts[0]);
+
+      const balance = await contract.getBalance(accounts[0]);
+      setAccountBalance(ethers.utils.formatEther(balance));
+      setWalletAddress(accounts[0]);
+    }
+  };
+
   return (
     <div>
-      <Header />
+      <Header walletAddress={walletAddress} auth={auth} />
       {/* <MultiPlierHistory /> */}
       {gameState ? (
         <GameSpace
@@ -356,4 +352,28 @@ export default function Home() {
       </div>
     </div>
   );
+}
+
+export async function getServerSideProps({ req, res }) {
+  const { token } = req.cookies;
+  if (!token) {
+    return {
+      props: {
+        auth: false,
+        walletAddress: "",
+        balance: "0",
+      },
+    };
+  }
+  const verify = jwt.verify(token, process.env.AUTH_TOKEN_PRIVATE_KEY);
+  const balance = await axios.post("/getBalance", {
+    walletAddress: verify.walletAddress,
+  });
+  return {
+    props: {
+      auth: verify ? true : false,
+      walletAddress: verify ? verify.walletAddress : "",
+      balance: verify ? balance.data.balance : "0",
+    },
+  };
 }

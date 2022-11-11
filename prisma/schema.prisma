@@ -29,5 +29,5 @@ model sessions {
   playeer   players  @relation(fields: [pid], references: [id])
   pid       String   @unique
   createdAt DateTime @default(now())
-  token     String
+  token     String   @db.LongText
 }

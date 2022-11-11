@@ -7,7 +7,7 @@ import { ProfileIcon, MenuIcon, SettingsIcon } from "../components/icons";
 import axios from "../config/axios";
 import ContractAbi from "../artifacts/contracts/Spaceshot.sol/Spaceshot.json";
 
-const Header = () => {
+const Header = ({ walletAddress, auth }) => {
   let [openSettingsModal, setOpenSettingsModal] = useState(false);
   const [openMenuOptions, setOpenMenuOptions] = useState(false);
   const [openProfileModal, setOpenProfileModal] = useState(false);
@@ -21,12 +21,12 @@ const Header = () => {
 
   const [metaMaskError, setMetaMaskError] = useState(false);
   const [metaMask, setMetaMask] = useState(false);
-  const [walletAddress, setWalletAddress] = useState("");
 
   const loginWithMetaMask = async () => {
     if (typeof window.ethereum == "undefined") {
       return setMetaMaskError(true);
     }
+
     const accounts = await window.ethereum.request({
       method: "eth_requestAccounts",
     });
@@ -34,15 +34,15 @@ const Header = () => {
     try {
       const res = await axios.post("/login", { walletAddress: accounts[0] });
 
+      setWalletAddress(res.data.data.walletAddress);
       console.log(res);
-    } catch (err) {}
-
-    setWalletAddress(accounts[0]);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const DepositAmount = async () => {
-    console.log("Deposit Amount", depositAmount);
-    const contractAddress = "0xB10A38A3f18D5A0AB6E9fd571f3B50B258cb7898";
+    const contractAddress = "0xd59BAD5EA33514783E3B2822523517e9B95834f6";
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
     const signer = provider.getSigner();
@@ -63,8 +63,26 @@ const Header = () => {
     }
   };
 
+  const getBalance = async () => {
+    const contractAddress = "0xd59BAD5EA33514783E3B2822523517e9B95834f6";
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const accounts = await provider.listAccounts();
+    const signer = provider.getSigner();
+    const network = await provider.getNetwork();
+
+    const contract = new ethers.Contract(
+      contractAddress,
+      ContractAbi.abi,
+      signer
+    );
+
+    const balance = await contract.getBalance(walletAddress);
+
+    console.log(ethers.utils.formatEther(balance));
+  };
+
   const checkAccounts = async () => {
-    const contractAddress = "0xB10A38A3f18D5A0AB6E9fd571f3B50B258cb7898";
+    const contractAddress = "0xd59BAD5EA33514783E3B2822523517e9B95834f6";
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
     const signer = provider.getSigner();
@@ -72,23 +90,11 @@ const Header = () => {
 
     if (!accounts[0]) {
       setWalletAddress("");
-    } else {
-      const contract = new ethers.Contract(
-        contractAddress,
-        ContractAbi.abi,
-        signer
-      );
-
-      console.log("Wallet Address:", accounts[0]);
-
-      const balance = await contract.getBalance(accounts[0]);
-      setAccountBalance(ethers.utils.formatEther(balance));
-      setWalletAddress(accounts[0]);
     }
   };
 
   const withdraw = async () => {
-    const contractAddress = "0xB10A38A3f18D5A0AB6E9fd571f3B50B258cb7898";
+    const contractAddress = "0xd59BAD5EA33514783E3B2822523517e9B95834f6";
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
     const signer = provider.getSigner();
@@ -387,6 +393,7 @@ const Header = () => {
                         >
                           WITHDRAW
                         </button>
+                        <button onClick={getBalance}>Get Balance</button>
                       </div>
                       <h1 className="font-VT323 text-3xl mt-3">
                         Balance : {accountBalace} SHM
