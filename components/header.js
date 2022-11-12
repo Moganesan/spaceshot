@@ -14,6 +14,7 @@ const Header = ({ walletAddress, auth }) => {
   const [enableSound, setEnableSound] = useState(false);
   const [enableAnimation, setEnableAnimation] = useState(false);
   const [enableChatSound, setEnableChatSound] = useState(false);
+  const [WalletAddress, setWalletAddress] = useState("");
 
   const [depositAmount, setDepositAmount] = useState("");
   const [withdrawAmount, setWithdrawAmount] = useState("");
@@ -33,9 +34,7 @@ const Header = ({ walletAddress, auth }) => {
 
     try {
       const res = await axios.post("/login", { walletAddress: accounts[0] });
-
       setWalletAddress(res.data.data.walletAddress);
-      console.log(res);
     } catch (err) {
       console.log(err);
     }
@@ -79,18 +78,6 @@ const Header = ({ walletAddress, auth }) => {
     const balance = await contract.getBalance(walletAddress);
 
     console.log(ethers.utils.formatEther(balance));
-  };
-
-  const checkAccounts = async () => {
-    const contractAddress = "0xd59BAD5EA33514783E3B2822523517e9B95834f6";
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const accounts = await provider.listAccounts();
-    const signer = provider.getSigner();
-    const network = await provider.getNetwork();
-
-    if (!accounts[0]) {
-      setWalletAddress("");
-    }
   };
 
   const withdraw = async () => {
@@ -137,8 +124,19 @@ const Header = ({ walletAddress, auth }) => {
     setOpenProfileModal(false);
   }
 
+  const checkAccount = async () => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const accounts = await provider.listAccounts();
+    if (accounts[0]) {
+      console.log("Wallet Address", walletAddress);
+      setWalletAddress(walletAddress);
+    } else {
+      setWalletAddress("");
+    }
+  };
+
   useEffect(() => {
-    checkAccounts();
+    checkAccount();
   }, []);
 
   return (
@@ -147,7 +145,7 @@ const Header = ({ walletAddress, auth }) => {
         <h1 className="text-yellow-400 font-VT323 text-5xl">SPACESHOT</h1>
       </div>
       <div className="md:w-96 smb:w-96 flex items-center justify-around">
-        {walletAddress ? (
+        {WalletAddress ? (
           <button
             className="md:w-10 md:h-10 "
             onClick={() => OpenProfileModal()}

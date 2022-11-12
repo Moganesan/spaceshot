@@ -120,33 +120,94 @@ export default function Home({ auth, walletAddress }) {
     const gameBalane = await contract.getBalance(accounts[0]);
     console.log("Game Balance", gameBalane);
   };
+  // const placeBet = async () => {
+  //   // getGameBalance();
+  //   if (amount == 0 || multiplier == 0) return;
+  //   if (transaction) return;
+
+  //   const multiplierCrash = await getBlockHash();
+
+  //   const res = await axios.post("/betAmount", {
+  //     amount: amount,
+  //     multiplier: multiplier,
+  //     gameMultiplier: multiplierCrash,
+  //   });
+
+  //   console.log(res.data);
+  //   // addPlayerDetails((oldPlayers) => [
+  //   //   ...oldPlayers,
+  //   //   {
+  //   //     player: accounts[0],
+  //   //     betAmount: ethers.utils.formatEther(_amount),
+  //   //     multiplier: ethers.utils.formatUnits(_multiplier),
+  //   //     payout: ethers.utils.formatUnits(profit),
+  //   //     gameMultiplier: ethers.utils.formatUnits(_gameMultiplier),
+  //   //   },
+  //   // ]);
+
+  //   // setTransaction(false);
+  //   // dispatch(startGame());
+  // };
+
   const placeBet = async () => {
     // getGameBalance();
     if (amount == 0 || multiplier == 0) return;
     if (transaction) return;
-
     const multiplierCrash = await getBlockHash();
+    const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const accounts = await provider.listAccounts();
+    const signer = provider.getSigner();
+    const network = await provider.getNetwork();
 
-    const res = await axios.post("/betAmount", {
-      amount: amount,
-      multiplier: multiplier,
-      gameMultiplier: multiplierCrash,
-    });
+    const contract = new ethers.Contract(
+      contractAddress,
+      ContractAbi.abi,
+      signer
+    );
 
-    console.log(res.data);
-    // addPlayerDetails((oldPlayers) => [
-    //   ...oldPlayers,
-    //   {
-    //     player: accounts[0],
-    //     betAmount: ethers.utils.formatEther(_amount),
-    //     multiplier: ethers.utils.formatUnits(_multiplier),
-    //     payout: ethers.utils.formatUnits(profit),
-    //     gameMultiplier: ethers.utils.formatUnits(_gameMultiplier),
-    //   },
-    // ]);
+    setOpenMetaMask(true);
 
-    // setTransaction(false);
-    // dispatch(startGame());
+    try {
+      setTransaction(true);
+
+      console.log("Multiplier:", multiplier);
+      console.log(
+        "Multiplier Crash",
+        Number(ethers.utils.parseUnits(multiplierCrash.toString()))
+      );
+
+      const contractCall = await contract.betAmount(
+        walletAddress,
+        ethers.utils.parseEther(amount.toString()),
+        ethers.utils.parseUnits(multiplier.toString()),
+        ethers.utils.parseUnits(multiplierCrash.toString())
+      );
+
+      const res = await contractCall.wait();
+
+      const events = res.events.find((event) => event.event == "returnResult");
+
+      const [_amount, _gameMultiplier, _multiplier, profit] = events.args;
+
+      addPlayerDetails((oldPlayers) => [
+        ...oldPlayers,
+        {
+          player: accounts[0],
+          betAmount: ethers.utils.formatEther(_amount),
+          multiplier: ethers.utils.formatUnits(_multiplier),
+          payout: ethers.utils.formatUnits(profit),
+          gameMultiplier: ethers.utils.formatUnits(_gameMultiplier),
+        },
+      ]);
+
+      setTransaction(false);
+      dispatch(startGame());
+    } catch (err) {
+      setTransaction(false);
+      setMultiplier(0);
+      console.log(err);
+    }
   };
 
   const endGame = async () => {
