@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import hre from "hardhat";
+import { ethers } from "ethers";
 import prisma from "../../config/prisma";
 import ContractAbi from "../../artifacts/contracts/Spaceshot.sol/Spaceshot.json";
 
@@ -16,47 +16,77 @@ export default async function betAmount(req, res) {
 
   const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
   const rpc_url = process.env.RPC_URL;
-  const provider = new hre.ethers.providers.JsonRpcProvider(rpc_url, {
-    name: "Shardeum",
-    chainId: 8080,
+  const network_name = process.env.NETWORK_NAME;
+  const chainId = parseInt(process.env.CHAIN_ID);
+  const provider = new ethers.providers.JsonRpcProvider(rpc_url, {
+    name: network_name,
+    chainId: chainId,
   });
 
-  const signer = new hre.ethers.Wallet(
+  const signer = new ethers.Wallet(
     "755b276b5aab56178ee64ff33e905f03b9ff33e04ebe778fd33ece2b84bb41df",
     provider
   );
-  const contract = new hre.ethers.Contract(
+  const contract = new ethers.Contract(
     contractAddress,
     ContractAbi.abi,
     signer
   );
 
-  console.log(verify.walletAddress);
-  console.log(amount);
-  console.log(multiplier);
-  console.log(gameMultiplier);
   try {
     const contractCall = await contract.betAmount(
       verify.walletAddress.toLowerCase(),
-      hre.ethers.utils.parseEther(amount.toString()),
-      hre.ethers.utils.parseUnits(multiplier.toString()),
-      hre.ethers.utils.parseUnits(gameMultiplier.toString())
+      ethers.utils.parseEther(amount),
+      ethers.utils.parseUnits(multiplier),
+      ethers.utils.parseUnits(gameMultiplier),
+      { gasLimit: 5000000 }
     );
 
-    const res = await contractCall.wait();
+    const contractRes = await contractCall.wait();
 
-    const events = res.events.find((event) => event.event == "returnResult");
+    const events = contractRes.events.find(
+      (event) => event.event == "returnResult"
+    );
 
     const [_amount, _gameMultiplier, _multiplier, profit] = events.args;
 
-    console.log(_amount);
+    const _profit = parseFloat(ethers.utils.formatUnits(profit));
+
+    const betAmount = parseFloat(ethers.utils.formatEther(_amount));
+
+    if (_profit == 0) {
+      await prisma.players.update({
+        where: {
+          walletAddress: verify.walletAddress,
+        },
+        data: {
+          balance: {
+            decrement: betAmount,
+          },
+        },
+      });
+    } else {
+      await prisma.players.update({
+        where: {
+          walletAddress: verify.walletAddress,
+        },
+        data: {
+          balance: {
+            increment: amount * ethers.utils.formatUnits(_multiplier),
+          },
+        },
+      });
+    }
+
+    console.log("Transaction is Completed");
+
     return res.status(200).send({
       status: 200,
       data: {
-        amount: hre.ethers.utils.parseEther(_amount),
-        multiplier: hre.ethers.utils.parseUnits(_multiplier),
-        crash: hre.ethers.utils.parseUnits(_gameMultiplier),
-        profit: hre.ethers.utils.parseUnits(profit),
+        amount: ethers.utils.formatEther(_amount),
+        multiplier: ethers.utils.formatUnits(_multiplier),
+        crash: ethers.utils.formatUnits(_gameMultiplier),
+        profit: ethers.utils.formatEther(profit),
       },
     });
   } catch (err) {
