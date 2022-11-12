@@ -99,12 +99,11 @@ const Header = ({ walletAddress, balance, auth }) => {
     );
 
     try {
-      console.log(
-        ethers.utils.formatEther(ethers.utils.parseEther(withdrawAmount))
-      );
-      await contract.withdraw(
-        ethers.utils.parseEther(withdrawAmount, { gasLimit: 5000000 })
-      );
+      const res = await axios.post("/withdraw", {
+        amount: withdrawAmount.toString(),
+      });
+
+      setAccountBalance(res.data.data.balance);
     } catch (err) {
       console.log(err);
     }

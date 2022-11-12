@@ -36,6 +36,7 @@ export default function Home({ auth, walletAddress, balance }) {
   const gameState = useSelector((state) => state.ui["startGame"]);
   const [transaction, setTransaction] = useState(false);
   const [multiplierCrash, setMultiplierCrash] = useState("");
+  const [accountBalance, setAccountBalance] = useState(0);
 
   const dispatch = useDispatch();
 
@@ -134,6 +135,10 @@ export default function Home({ auth, walletAddress, balance }) {
       gameMultiplier: multiplierCrash.toString(),
     });
 
+    const balanceRes = await axios.post("/getBalance", {
+      walletAddress: walletAddress,
+    });
+    balance = balanceRes;
     const { data } = res.data;
     addPlayerDetails((oldPlayers) => [
       ...oldPlayers,
@@ -287,7 +292,6 @@ export default function Home({ auth, walletAddress, balance }) {
       console.log("Wallet Address:", accounts[0]);
 
       const balance = await contract.getBalance(accounts[0]);
-      setAccountBalance(ethers.utils.formatEther(balance));
       setWalletAddress(accounts[0]);
     }
   };
@@ -428,6 +432,7 @@ export async function getServerSideProps({ req, res }) {
     };
   }
   const verify = jwt.verify(token, process.env.AUTH_TOKEN_PRIVATE_KEY);
+  console.log("User", verify);
   const balance = await axios.post("/getBalance", {
     walletAddress: verify.walletAddress,
   });

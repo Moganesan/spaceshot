@@ -27,6 +27,7 @@ export default async function betAmount(req, res) {
     "755b276b5aab56178ee64ff33e905f03b9ff33e04ebe778fd33ece2b84bb41df",
     provider
   );
+
   const contract = new ethers.Contract(
     contractAddress,
     ContractAbi.abi,
@@ -90,6 +91,10 @@ export default async function betAmount(req, res) {
       },
     });
   } catch (err) {
+    return res.status(500).send({
+      status: 500,
+      error: err,
+    });
     console.log(err);
   }
 }
