@@ -17,5 +17,11 @@ module.exports = {
         "c6d851c07dbef0e82ba820ed8624fffff2fbc70e734062ad75ed78059ac6d927",
       ],
     },
+    polygon: {
+      url: "https://rpc-mumbai.maticvigil.com/",
+      accounts: [
+        "755b276b5aab56178ee64ff33e905f03b9ff33e04ebe778fd33ece2b84bb41df",
+      ],
+    },
   },
 };

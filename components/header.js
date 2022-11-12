@@ -7,7 +7,7 @@ import { ProfileIcon, MenuIcon, SettingsIcon } from "../components/icons";
 import axios from "../config/axios";
 import ContractAbi from "../artifacts/contracts/Spaceshot.sol/Spaceshot.json";
 
-const Header = ({ walletAddress, auth }) => {
+const Header = ({ walletAddress, balance, auth }) => {
   let [openSettingsModal, setOpenSettingsModal] = useState(false);
   const [openMenuOptions, setOpenMenuOptions] = useState(false);
   const [openProfileModal, setOpenProfileModal] = useState(false);
@@ -41,7 +41,7 @@ const Header = ({ walletAddress, auth }) => {
   };
 
   const DepositAmount = async () => {
-    const contractAddress = "0xd59BAD5EA33514783E3B2822523517e9B95834f6";
+    const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
     const signer = provider.getSigner();
@@ -57,13 +57,18 @@ const Header = ({ walletAddress, auth }) => {
       await contract.deposit({
         value: ethers.utils.parseEther(depositAmount),
       });
+
+      console.log("Deposit Amount", depositAmount);
+      const res = await axios.post("/deposit", { amount: depositAmount });
+      console.log("res", res);
+      setAccountBalance(res.data.data.walletBalance);
     } catch (err) {
       console.log(err);
     }
   };
 
   const getBalance = async () => {
-    const contractAddress = "0xd59BAD5EA33514783E3B2822523517e9B95834f6";
+    const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
     const signer = provider.getSigner();
@@ -81,7 +86,7 @@ const Header = ({ walletAddress, auth }) => {
   };
 
   const withdraw = async () => {
-    const contractAddress = "0xd59BAD5EA33514783E3B2822523517e9B95834f6";
+    const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
     const signer = provider.getSigner();
@@ -94,7 +99,12 @@ const Header = ({ walletAddress, auth }) => {
     );
 
     try {
-      await contract.withdraw(withdrawAmount);
+      console.log(
+        ethers.utils.formatEther(ethers.utils.parseEther(withdrawAmount))
+      );
+      await contract.withdraw(
+        ethers.utils.parseEther(withdrawAmount, { gasLimit: 5000000 })
+      );
     } catch (err) {
       console.log(err);
     }
@@ -136,6 +146,7 @@ const Header = ({ walletAddress, auth }) => {
   };
 
   useEffect(() => {
+    setAccountBalance(balance);
     checkAccount();
   }, []);
 

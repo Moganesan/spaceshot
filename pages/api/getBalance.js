@@ -12,6 +12,6 @@ export default async function getBalance(req, res) {
 
   return res.status(200).send({
     status: 200,
-    balance: balance,
+    balance: balance.balance,
   });
 }

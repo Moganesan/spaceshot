@@ -13,7 +13,7 @@ datasource db {
 model players {
   id            String     @id @default(cuid())
   walletAddress String     @unique
-  balance       Int
+  balance       Float
   sessions      sessions[]
 }
 

@@ -1,27 +1,36 @@
-import hre from "hardhat";
-import ContractAbi from "../../artifacts/contracts/Spaceshot.sol/Spaceshot.json";
+import jwt from "jsonwebtoken";
+import prisma from "../../config/prisma";
 
 export default async function deposit(req, res) {
   const { token } = req.cookies;
+  const { amount } = req.body;
+  if (!token) {
+    return res.status(403).send({
+      status: 403,
+      message: "Unauthorized Request",
+    });
+  }
 
-  console.log(token);
-  const contractAddress = "0xd59BAD5EA33514783E3B2822523517e9B95834f6";
-  const provider = new hre.ethers.providers.JsonRpcProvider(
-    "https://liberty10.shardeum.org/",
-    {
-      name: "Shardeum",
-      chainId: 8080,
-    }
-  );
-  const signer = provider.getSigner();
+  const verify = jwt.verify(token, process.env.AUTH_TOKEN_PRIVATE_KEY);
 
-  const contract = new hre.ethers.Contract(
-    contractAddress,
-    ContractAbi.abi,
-    signer
-  );
+  try {
+    const player = await prisma.players.update({
+      where: {
+        walletAddress: verify.walletAddress,
+      },
+      data: {
+        balance: { increment: parseFloat(amount) },
+      },
+    });
 
-  const balance = await contract.getBalance(walletAddress);
-
-  res.send(hre.ethers.utils.formatEther(balance));
+    return res.status(200).send({
+      status: 200,
+      data: {
+        walletBalance: player.balance,
+      },
+      message: "Wallet Balance Updated",
+    });
+  } catch (err) {
+    console.log(err);
+  }
 }

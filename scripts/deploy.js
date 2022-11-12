@@ -16,7 +16,7 @@ async function main() {
 
   await deploy.deployed();
 
-  await deploy.deposit({ value: hre.ethers.utils.parseEther("2") });
+  // await deploy.deposit({ value: hre.ethers.utils.parseEther("2") });
 
   const balance = await deploy.getBalance(deployer.address);
 

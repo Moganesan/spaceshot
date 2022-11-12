@@ -24,20 +24,19 @@ contract Spaceshot {
         uint256 profit
     );
 
-    function deposit() public payable {
+    function deposit() public payable returns (uint256) {
         balances[msg.sender] += msg.value;
-        transactions++;
+        return balances[msg.sender];
     }
 
     function withdraw(uint256 _amount) public payable {
         address payable senderAddress = payable(msg.sender);
         require(
-            balances[msg.sender] >= _amount * (1 ether) &&
-                address(this).balance >= _amount,
+            balances[msg.sender] >= _amount * (1 ether),
             "Insufficient Funds"
         );
-        balances[msg.sender] -= _amount * (1 ether);
-        senderAddress.transfer(_amount * (1 ether));
+        balances[msg.sender] -= _amount;
+        senderAddress.transfer(_amount);
     }
 
     function getPlayerCount() public view returns (uint256) {
@@ -74,7 +73,7 @@ contract Spaceshot {
                 amount * multiplier
             );
         } else {
-            balances[player] -= amount;
+            balances[player] -= amount * (1 ether);
             emit returnResult(amount, gameMultiplier, multiplier, 0);
         }
     }
