@@ -45,7 +45,6 @@ const Header = ({ walletAddress, balance, auth }) => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
     const signer = provider.getSigner();
-    const network = await provider.getNetwork();
 
     const contract = new ethers.Contract(
       contractAddress,
@@ -62,6 +61,7 @@ const Header = ({ walletAddress, balance, auth }) => {
       const res = await axios.post("/deposit", { amount: depositAmount });
       console.log("res", res);
       setAccountBalance(res.data.data.walletBalance);
+      setDepositAmount("");
     } catch (err) {
       console.log(err);
     }
@@ -401,7 +401,6 @@ const Header = ({ walletAddress, balance, auth }) => {
                         >
                           WITHDRAW
                         </button>
-                        <button onClick={getBalance}>Get Balance</button>
                       </div>
                       <h1 className="font-VT323 text-3xl mt-3">
                         Balance : {accountBalace} SHM

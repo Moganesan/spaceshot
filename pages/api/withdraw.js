@@ -35,8 +35,7 @@ export default async function withdraw(req, res) {
 
   try {
     const contractCall = await contract.withdraw(
-      ethers.utils.parseEther(amount),
-      { gasLimit: 5000000 }
+      ethers.utils.parseEther(amount)
     );
 
     const contractRes = await contractCall.wait();

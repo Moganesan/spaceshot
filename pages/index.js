@@ -25,6 +25,8 @@ import {
 } from "../public/gameassets/gameIcons";
 import jwt from "jsonwebtoken";
 import axios from "../config/axios";
+import { useSelector } from "react-redux";
+import { useRef, useEffect } from "react";
 
 export default function Home({ auth, walletAddress, balance }) {
   const [amount, setAmount] = useState(0);
@@ -41,6 +43,15 @@ export default function Home({ auth, walletAddress, balance }) {
   const dispatch = useDispatch();
 
   const [playerDetails, addPlayerDetails] = useState([]);
+
+  const toastRef = useRef();
+
+  const alert = useSelector((state) => state.AlertMessage);
+
+  useEffect(() => {
+    if (alert.status == true)
+      toastRef.current.addMessage({ mode: alert.mode, message: alert.message });
+  }, [alert]);
 
   const startTimer = () => {
     console.log("Run :", run);
@@ -369,7 +380,7 @@ export default function Home({ auth, walletAddress, balance }) {
             <div className="md:ml-20 md:mt-0 smb:mt-10 w-96">
               {!gameState ? (
                 <button className="button3" onClick={() => placeBet()}>
-                  PLACE BET
+                  {multiplier} PREDICT
                 </button>
               ) : (
                 <button className="button2 cursor-wait">
@@ -432,7 +443,6 @@ export async function getServerSideProps({ req, res }) {
     };
   }
   const verify = jwt.verify(token, process.env.AUTH_TOKEN_PRIVATE_KEY);
-  console.log("User", verify);
   const balance = await axios.post("/getBalance", {
     walletAddress: verify.walletAddress,
   });

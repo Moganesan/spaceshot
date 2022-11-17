@@ -4,9 +4,16 @@ require("@nomicfoundation/hardhat-toolbox");
 module.exports = {
   solidity: "0.8.17",
   networks: {
-    shardeum: {
+    shardeum2: {
       url: "https://liberty20.shardeum.org/",
       chainId: 8081,
+      accounts: [
+        "755b276b5aab56178ee64ff33e905f03b9ff33e04ebe778fd33ece2b84bb41df",
+      ],
+    },
+    shardeum: {
+      url: "https://liberty10.shardeum.org/",
+      chainId: 8080,
       accounts: [
         "755b276b5aab56178ee64ff33e905f03b9ff33e04ebe778fd33ece2b84bb41df",
       ],

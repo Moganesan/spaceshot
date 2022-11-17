@@ -36,11 +36,30 @@ export default async function betAmount(req, res) {
 
   try {
     const contractCall = await contract.betAmount(
-      verify.walletAddress.toLowerCase(),
+      verify.walletAddress,
       ethers.utils.parseEther(amount),
       ethers.utils.parseUnits(multiplier),
       ethers.utils.parseUnits(gameMultiplier),
-      { gasLimit: 5000000 }
+      {
+        gasLimit: 500000,
+        gasPrice: ethers.utils.parseUnits("150", "gwei").toString(),
+        type: 1,
+        accessList: [
+          {
+            address: "0x6493A2Ed4B180460D4B275175a20dA7e050fce86", // admin gnosis safe proxy address
+            storageKeys: [
+              "0x0000000000000000000000000000000000000000000000000000000000000000",
+            ],
+          },
+          {
+            address:
+              "0xea5f7a16b5d4f491ab578103174356a2ff8b011b76997db36862aa168a920233", // proceedsRecipient gnosis safe proxy address
+            storageKeys: [
+              "0x0000000000000000000000000000000000000000000000000000000000000000",
+            ],
+          },
+        ],
+      }
     );
 
     const contractRes = await contractCall.wait();
@@ -91,10 +110,10 @@ export default async function betAmount(req, res) {
       },
     });
   } catch (err) {
+    console.log(err);
     return res.status(500).send({
       status: 500,
       error: err,
     });
-    console.log(err);
   }
 }

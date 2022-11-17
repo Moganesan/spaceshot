@@ -13,7 +13,7 @@ const WaitingSpace = ({ transaction }) => {
       <span className="text-green-400 font-VT323 text-2xl font-bold">
         {transaction
           ? "wait for completing transaction"
-          : "Place bet for starting new game"}
+          : "Make New Prediction for starting new game"}
       </span>
     </div>
   );
