@@ -26,6 +26,10 @@ import {
 import jwt from "jsonwebtoken";
 import axios from "../config/axios";
 import { ToastProvider } from "react-toast-notifications";
+import {
+  setErrorMessage,
+  setSuccessMessage,
+} from "../store/features/alertMessageSlice";
 import { ToastPortal } from "../components/ToastPortal";
 
 export default function Home({ auth, walletAddress, balance }) {
@@ -138,32 +142,39 @@ export default function Home({ auth, walletAddress, balance }) {
 
     const multiplierCrash = await getBlockHash();
 
-    setTransaction(true);
-    const res = await axios.post("/betAmount", {
-      walletAddress,
-      amount: amount.toString(),
-      multiplier: multiplier.toString(),
-      gameMultiplier: multiplierCrash.toString(),
-    });
+    console.log(walletAddress);
 
-    const balanceRes = await axios.post("/getBalance", {
-      walletAddress: walletAddress,
-    });
-    balance = balanceRes;
-    const { data } = res.data;
-    addPlayerDetails((oldPlayers) => [
-      ...oldPlayers,
-      {
-        player: walletAddress,
-        betAmount: data.amount,
-        multiplier: data.multiplier,
-        payout: data.profit,
-        gameMultiplier: data.crash,
-      },
-    ]);
+    try {
+      setTransaction(true);
+      const res = await axios.post("/betAmount", {
+        walletAddress,
+        amount: amount.toString(),
+        multiplier: multiplier.toString(),
+        gameMultiplier: multiplierCrash.toString(),
+      });
 
-    setTransaction(false);
-    dispatch(startGame());
+      const balanceRes = await axios.post("/getBalance", {
+        walletAddress: walletAddress,
+      });
+      balance = balanceRes;
+      const { data } = res.data;
+      addPlayerDetails((oldPlayers) => [
+        ...oldPlayers,
+        {
+          player: walletAddress,
+          betAmount: data.amount,
+          multiplier: data.multiplier,
+          payout: data.profit,
+          gameMultiplier: data.crash,
+        },
+      ]);
+
+      setTransaction(false);
+      dispatch(startGame());
+    } catch (err) {
+      setTransaction(false);
+      setErrorMessage({ code: err.code, message: err.message });
+    }
   };
 
   // const placeBet = async () => {

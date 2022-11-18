@@ -24,7 +24,7 @@ export default async function betAmount(req, res) {
   });
 
   const signer = new ethers.Wallet(
-    "755b276b5aab56178ee64ff33e905f03b9ff33e04ebe778fd33ece2b84bb41df",
+    process.env.TRANSACTION_SIGNER_PRIVATE_KEY,
     provider
   );
 
@@ -35,6 +35,7 @@ export default async function betAmount(req, res) {
   );
 
   try {
+    console.log("Wallet Address", verify.walletAddress);
     const contractCall = await contract.betAmount(
       verify.walletAddress,
       ethers.utils.parseEther(amount),
@@ -46,14 +47,13 @@ export default async function betAmount(req, res) {
         type: 1,
         accessList: [
           {
-            address: "0x6493A2Ed4B180460D4B275175a20dA7e050fce86", // admin gnosis safe proxy address
+            address: verify.walletAddress,
             storageKeys: [
               "0x0000000000000000000000000000000000000000000000000000000000000000",
             ],
           },
           {
-            address:
-              "0xea5f7a16b5d4f491ab578103174356a2ff8b011b76997db36862aa168a920233", // proceedsRecipient gnosis safe proxy address
+            address: contractAddress,
             storageKeys: [
               "0x0000000000000000000000000000000000000000000000000000000000000000",
             ],

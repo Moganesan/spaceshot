@@ -1,10 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const state = {
-  status: true,
-  mode: "success",
-  code: "200",
-  message: "hi",
+  status: false,
+  mode: "",
+  code: "",
+  message: "",
 };
 
 export const alertMessageSlice = createSlice({
@@ -12,41 +12,29 @@ export const alertMessageSlice = createSlice({
   initialState: state,
   reducers: {
     setErrorMessage: (state, actions) => {
-      state = {
-        ...state,
-        status: true,
-        mode: "error",
-        code: actions.payload.code,
-        message: actions.payload.message,
-      };
+      state.status = true;
+      state.mode = "error";
+      state.code = actions.payload.code;
+      state.message = actions.payload.message;
     },
-    setWarningMessage: (state, action) => {
-      state = {
-        ...state,
-        status: true,
-        mode: "warning",
-        code: action.payload.code,
-        message: action.payload.message,
-      };
+    setWarningMessage: (state, actions) => {
+      state.status = true;
+      state.mode = "warning";
+      state.code = actions.payload.code;
+      state.message = actions.payload.message;
     },
-    setInfoMessage: (state, action) => {
-      state = {
-        ...state,
-        status: true,
-        mode: "info",
-        code: action.payload.code,
-        message: actions.payload.message,
-      };
+    setInfoMessage: (state, actions) => {
+      state.status = true;
+      state.mode = "info";
+      state.code = actions.payload.code;
+      state.message = actions.payload.message;
     },
 
-    setSuccessMessage: (state, action) => {
-      state = {
-        ...state,
-        status: true,
-        mode: "success",
-        code: action.payload.code,
-        message: action.payload.message,
-      };
+    setSuccessMessage: (state, actions) => {
+      state.status = true;
+      state.mode = "success";
+      state.code = actions.payload.code;
+      state.message = actions.payload.message;
     },
   },
 });
@@ -58,6 +46,6 @@ export const {
   setWarningMessage,
   setInfoMessage,
   setSuccessMessage,
-} = alertMessageSlice.reducer;
+} = alertMessageSlice.actions;
 
 export default reducer;

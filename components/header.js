@@ -5,7 +5,12 @@ import { ethers } from "ethers";
 import { Switch } from "@headlessui/react";
 import { ProfileIcon, MenuIcon, SettingsIcon } from "../components/icons";
 import axios from "../config/axios";
+import {
+  setSuccessMessage,
+  setErrorMessage,
+} from "../store/features/alertMessageSlice";
 import ContractAbi from "../artifacts/contracts/Spaceshot.sol/Spaceshot.json";
+import { useDispatch } from "react-redux";
 
 const Header = ({ walletAddress, balance, auth }) => {
   let [openSettingsModal, setOpenSettingsModal] = useState(false);
@@ -22,6 +27,7 @@ const Header = ({ walletAddress, balance, auth }) => {
 
   const [metaMaskError, setMetaMaskError] = useState(false);
   const [metaMask, setMetaMask] = useState(false);
+  const dispatch = useDispatch();
 
   const loginWithMetaMask = async () => {
     if (typeof window.ethereum == "undefined") {
@@ -61,8 +67,15 @@ const Header = ({ walletAddress, balance, auth }) => {
       const res = await axios.post("/deposit", { amount: depositAmount });
       console.log("res", res);
       setAccountBalance(res.data.data.walletBalance);
+      dispatch(
+        setSuccessMessage({
+          code: "200",
+          message: "Amount Deposited Successfully",
+        })
+      );
       setDepositAmount("");
     } catch (err) {
+      dispatch(setErrorMessage({ code: err.code, message: err.message }));
       console.log(err);
     }
   };
@@ -104,7 +117,20 @@ const Header = ({ walletAddress, balance, auth }) => {
       });
 
       setAccountBalance(res.data.data.balance);
+
+      dispatch(
+        setSuccessMessage({
+          code: "200",
+          message: "Amount credited successfully",
+        })
+      );
     } catch (err) {
+      dispatch(
+        setErrorMessage({
+          code: err.code,
+          message: err.message,
+        })
+      );
       console.log(err);
     }
   };

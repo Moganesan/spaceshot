@@ -1,9 +1,7 @@
 import { useMemo, useEffect } from "react";
 import styles from "./styles.module.css";
 import error from "../../../public/error.svg";
-import warning from "../../../public/warning.svg";
-import info from "../../../public/info.svg";
-import success from "../../../public/success.svg";
+import Image from "next/image";
 
 export const Toast = ({ mode, onClose, message }) => {
   const classes = useMemo(() => [styles.toast, styles[mode]].join(" "), [mode]);
@@ -15,22 +13,23 @@ export const Toast = ({ mode, onClose, message }) => {
   return (
     <div onClick={onClose} className={classes}>
       <div>
-        <img
-          style={{ width: 30, marginRight: 10 }}
+        <Image
+          width={30}
+          height={30}
           src={
             mode == "error"
               ? error
               : mode == "warning"
-              ? warning
+              ? "/warning.svg"
               : mode == "info"
-              ? info
+              ? "/info.svg"
               : mode == "success"
-              ? success
+              ? "/success.svg"
               : null
           }
         />
       </div>
-      <div className={styles.message}>{message}</div>
+      <div className="ml-5">{message}</div>
     </div>
   );
 };

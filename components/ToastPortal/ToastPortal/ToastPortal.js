@@ -6,7 +6,7 @@ import { useToastPortal, useToastAutoClose } from "../hooks";
 import { useState, forwardRef, useImperativeHandle } from "react";
 
 export const ToastPortal = forwardRef(
-  ({ autoClose = false, autoCloseTime = 5000 }, ref) => {
+  ({ autoClose = false, autoCloseTime = 2000 }, ref) => {
     const [toasts, setToasts] = useState([]);
     const { loaded, portalId } = useToastPortal();
 
