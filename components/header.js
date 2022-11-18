@@ -98,6 +98,24 @@ const Header = ({ walletAddress, balance, auth }) => {
     console.log(ethers.utils.formatEther(balance));
   };
 
+  const getGameBalance = async () => {
+    const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const accounts = await provider.listAccounts();
+    const signer = provider.getSigner();
+    const network = await provider.getNetwork();
+
+    const contract = new ethers.Contract(
+      contractAddress,
+      ContractAbi.abi,
+      signer
+    );
+
+    const balance = await contract.getGameBalance();
+
+    console.log("Game Balance", ethers.utils.formatEther(balance));
+  };
+
   const withdraw = async () => {
     const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -426,6 +444,12 @@ const Header = ({ walletAddress, balance, auth }) => {
                           className="font-VT323 text-2xl px-9 ml-3 bg-yellow-400 h-12"
                         >
                           WITHDRAW
+                        </button>
+                        <button onClick={() => getBalance()}>
+                          Get Balance
+                        </button>
+                        <button onClick={() => getGameBalance()}>
+                          Get Game balance
                         </button>
                       </div>
                       <h1 className="font-VT323 text-3xl mt-3">

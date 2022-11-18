@@ -12,16 +12,18 @@ async function main() {
   const deployerAddress = deployer.address;
 
   const contract = await hre.ethers.getContractFactory("Spaceshot");
-  const deploy = await contract.deploy();
+  const deploy = await contract.deploy({
+    value: hre.ethers.utils.parseEther("20"),
+  });
 
   await deploy.deployed();
 
   // await deploy.deposit({ value: hre.ethers.utils.parseEther("2") });
 
   const balance = await deploy.getBalance(deployer.address);
-
+  const gameBalance = await deploy.getGameBalance();
   console.log("Account Balance:", hre.ethers.utils.formatEther(balance));
-
+  console.log("Game Balance:", gameBalance);
   console.log("Contract Address:", deploy.address);
 }
 

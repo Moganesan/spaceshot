@@ -24,7 +24,7 @@ export default async function betAmount(req, res) {
   });
 
   const signer = new ethers.Wallet(
-    process.env.TRANSACTION_SIGNER_PRIVATE_KEY,
+    "755b276b5aab56178ee64ff33e905f03b9ff33e04ebe778fd33ece2b84bb41df",
     provider
   );
 
@@ -53,7 +53,7 @@ export default async function betAmount(req, res) {
             ],
           },
           {
-            address: contractAddress,
+            address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
             storageKeys: [
               "0x0000000000000000000000000000000000000000000000000000000000000000",
             ],

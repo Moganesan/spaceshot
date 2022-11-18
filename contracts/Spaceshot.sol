@@ -6,7 +6,7 @@ contract Spaceshot {
     uint256 public transactions;
     address owner;
 
-    constructor() {
+    constructor() payable {
         owner = msg.sender;
     }
 
