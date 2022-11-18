@@ -53,7 +53,7 @@ export default async function betAmount(req, res) {
             ],
           },
           {
-            address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
+            address: contractAddress,
             storageKeys: [
               "0x0000000000000000000000000000000000000000000000000000000000000000",
             ],

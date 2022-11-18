@@ -47,3 +47,5 @@ export const ToastPortal = forwardRef(
     );
   }
 );
+
+ToastPortal.displayName = "ToastPortal";

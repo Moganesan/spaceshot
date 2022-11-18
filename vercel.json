@@ -8,7 +8,7 @@
         "src": "package.json",
         "use": "@vercel/next",
         "config": {
-          "installCommand": "npm install  && npm install --save-dev hardhat && npx prisma migrate && npx prisma generate && npm run build"
+          "installCommand": "npm install --force && npm install --save-dev hardhat --force && npx prisma migrate && npx prisma generate && npm run build"
         }
       }
     ]

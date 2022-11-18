@@ -20,7 +20,7 @@ const Header = ({ walletAddress, balance, auth }) => {
   const [enableAnimation, setEnableAnimation] = useState(false);
   const [enableChatSound, setEnableChatSound] = useState(false);
   const [WalletAddress, setWalletAddress] = useState("");
-
+  const [loading, setLoading] = useState(false);
   const [depositAmount, setDepositAmount] = useState("");
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [accountBalace, setAccountBalance] = useState("");
@@ -59,6 +59,7 @@ const Header = ({ walletAddress, balance, auth }) => {
     );
 
     try {
+      setLoading(true);
       await contract.deposit({
         value: ethers.utils.parseEther(depositAmount),
       });
@@ -73,8 +74,10 @@ const Header = ({ walletAddress, balance, auth }) => {
           message: "Amount Deposited Successfully",
         })
       );
+      setLoading(false);
       setDepositAmount("");
     } catch (err) {
+      setLoading(false);
       dispatch(setErrorMessage({ code: err.code, message: err.message }));
       console.log(err);
     }
@@ -130,6 +133,7 @@ const Header = ({ walletAddress, balance, auth }) => {
     );
 
     try {
+      setLoading(true);
       const res = await axios.post("/withdraw", {
         amount: withdrawAmount.toString(),
       });
@@ -142,7 +146,9 @@ const Header = ({ walletAddress, balance, auth }) => {
           message: "Amount credited successfully",
         })
       );
+      setLoading(false);
     } catch (err) {
+      setLoading(false);
       dispatch(
         setErrorMessage({
           code: err.code,
@@ -425,8 +431,10 @@ const Header = ({ walletAddress, balance, auth }) => {
                           className="border-2 bg-gray-900 h-12 border-yellow-400 rounded-sm outline-none px-3"
                         />
                         <button
-                          onClick={() => DepositAmount()}
-                          className="font-VT323 text-2xl px-9 ml-3 bg-yellow-400 h-12"
+                          onClick={() => !loading && DepositAmount()}
+                          className={`font-VT323 text-2xl px-9 ml-3 bg-yellow-400 h-12 ${
+                            loading && "animate-pulse"
+                          } `}
                         >
                           DEPOSIT
                         </button>
@@ -440,8 +448,10 @@ const Header = ({ walletAddress, balance, auth }) => {
                           className="border-2 bg-gray-900 h-12 border-yellow-400 rounded-sm outline-none px-3"
                         />
                         <button
-                          onClick={() => withdraw()}
-                          className="font-VT323 text-2xl px-9 ml-3 bg-yellow-400 h-12"
+                          onClick={() => !loading && withdraw()}
+                          className={`font-VT323 text-2xl px-9 ml-3 bg-yellow-400 h-12 ${
+                            loading && "animate-pulse"
+                          }`}
                         >
                           WITHDRAW
                         </button>

@@ -14,6 +14,7 @@ export const Toast = ({ mode, onClose, message }) => {
     <div onClick={onClose} className={classes}>
       <div>
         <Image
+          alt="Icon"
           width={30}
           height={30}
           src={

@@ -173,7 +173,7 @@ export default function Home({ auth, walletAddress, balance }) {
       dispatch(startGame());
     } catch (err) {
       setTransaction(false);
-      setErrorMessage({ code: err.code, message: err.message });
+      dispatch(setErrorMessage({ code: err.code, message: err.message }));
     }
   };
 
@@ -321,130 +321,140 @@ export default function Home({ auth, walletAddress, balance }) {
   return (
     <ToastProvider>
       <ToastPortal ref={toastRef} autoClose={true} />
-
+      <Header walletAddress={walletAddress} balance={balance} auth={auth} />
       <div>
-        <Header walletAddress={walletAddress} balance={balance} auth={auth} />
-        {/* <MultiPlierHistory /> */}
-        {gameState ? (
-          <GameSpace
-            transaction={transaction}
-            setRun={setRun}
-            multiplier={multiplierCrash}
-          />
-        ) : (
-          <WaitingSpace transaction={transaction} />
-        )}
+        <div>
+          <div>
+            {/* <MultiPlierHistory /> */}
+            {gameState ? (
+              <GameSpace
+                transaction={transaction}
+                setRun={setRun}
+                multiplier={multiplierCrash}
+              />
+            ) : (
+              <WaitingSpace transaction={transaction} />
+            )}
+          </div>
 
-        <div className="md:px-10">
-          <div className="smb:px-3">
-            <div className="flex md:flex-row smb:flex-col">
-              <div className="border-2 h-20 md:w-96 smb:w-full border-yellow-400 px-3 py-3 rounded-md flex flex-col">
-                <span className="font-VT323 text-gray-300">Amount</span>
-                <input
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  className="text-white h-10 font-VT323 outline-none bg-transparent px-2 text-2xl"
-                  type={"number"}
-                />
-              </div>
-              <div className="border-2 h-20 md:w-96 smb:w-full border-yellow-400 px-3 py-3 rounded-md flex flex-col md:mt-0 smb:mt-10 md:ml-20">
-                <span className="font-VT323 text-gray-300">Auto Cashout</span>
-                <div className="flex items-center">
-                  <span className="font-VT323 text-2xl ml-2">X</span>
+          <div className="md:px-10">
+            <div className="smb:px-3">
+              <div className="flex md:flex-row smb:flex-col">
+                <div className="border-2 h-20 md:w-96 smb:w-full border-yellow-400 px-3 py-3 rounded-md flex flex-col">
+                  <span className="font-VT323 text-gray-300">Amount</span>
                   <input
-                    onChange={(e) => SetMultiplier(e.target.value)}
-                    value={multiplier}
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    className="text-white h-10 font-VT323 outline-none bg-transparent px-2 text-2xl"
                     type={"number"}
-                    className="text-white h-10 outline-none bg-transparent font-VT323 text-2xl px-2"
                   />
                 </div>
+                <div className="border-2 h-20 md:w-96 smb:w-full border-yellow-400 px-3 py-3 rounded-md flex flex-col md:mt-0 smb:mt-10 md:ml-20">
+                  <span className="font-VT323 text-gray-300">Auto Cashout</span>
+                  <div className="flex items-center">
+                    <span className="font-VT323 text-2xl ml-2">X</span>
+                    <input
+                      onChange={(e) => SetMultiplier(e.target.value)}
+                      value={multiplier}
+                      type={"number"}
+                      className="text-white h-10 outline-none bg-transparent font-VT323 text-2xl px-2"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="mt-5 flex md:flex-row smb:flex-col">
+                <div className="flex items-center w-96 justify-between">
+                  <div>
+                    <button
+                      onClick={minBetAmount}
+                      className="relative font-VT323"
+                    >
+                      <MinButton1 />
+                      <span className="absolute center">MIN</span>
+                    </button>
+                  </div>
+                  <div>
+                    <button
+                      onClick={decrementAmount}
+                      className="relative font-VT323"
+                    >
+                      <MinusButton1 />
+                    </button>
+                  </div>
+                  <div>
+                    <button
+                      onClick={incrementBetAmount}
+                      className="relative font-VT323"
+                    >
+                      <AddButton1 />
+                    </button>
+                  </div>
+                  <div>
+                    <button
+                      onClick={maxBetAmount}
+                      className="relative font-VT323"
+                    >
+                      <MinButton1 />
+                      <span className="absolute center">MAX</span>
+                    </button>
+                  </div>
+                </div>
+                <div className="md:ml-20 md:mt-0 smb:mt-10 w-96">
+                  {!gameState ? (
+                    <button
+                      className={`button3 anima ${
+                        transaction && "animate-pulse"
+                      }`}
+                      onClick={() => placeBet()}
+                    >
+                      {multiplier} PREDICT
+                    </button>
+                  ) : (
+                    <button className="button2 cursor-wait">
+                      Wait FOR NEXT ROUND
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
-            <div className="mt-5 flex md:flex-row smb:flex-col">
-              <div className="flex items-center w-96 justify-between">
-                <div>
-                  <button
-                    onClick={minBetAmount}
-                    className="relative font-VT323"
-                  >
-                    <MinButton1 />
-                    <span className="absolute center">MIN</span>
-                  </button>
-                </div>
-                <div>
-                  <button
-                    onClick={decrementAmount}
-                    className="relative font-VT323"
-                  >
-                    <MinusButton1 />
-                  </button>
-                </div>
-                <div>
-                  <button
-                    onClick={incrementBetAmount}
-                    className="relative font-VT323"
-                  >
-                    <AddButton1 />
-                  </button>
-                </div>
-                <div>
-                  <button
-                    onClick={maxBetAmount}
-                    className="relative font-VT323"
-                  >
-                    <MinButton1 />
-                    <span className="absolute center">MAX</span>
-                  </button>
-                </div>
-              </div>
-              <div className="md:ml-20 md:mt-0 smb:mt-10 w-96">
-                {!gameState ? (
-                  <button className="button3" onClick={() => placeBet()}>
-                    {multiplier} PREDICT
-                  </button>
-                ) : (
-                  <button className="button2 cursor-wait">
-                    Wait FOR NEXT ROUND
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
 
-          <div className="mt-10">
-            <table className="table-body font-VT323">
-              <thead className="text-gray-600">
-                <tr>
-                  <th>Player</th>
-                  <th>Bet Amount</th>
-                  <th>Multiplier</th>
-                  <th>Payout</th>
-                  <th>Crsh</th>
-                </tr>
-              </thead>
-              {!gameState && (
-                <tbody>
-                  {playerDetails.map((player, index) => {
-                    return (
-                      <tr
-                        className={
-                          player.payout >= 1 ? `text-green-300` : `text-red-300`
-                        }
-                        key={index}
-                      >
-                        <td>{player.player}</td>
-                        <td>{player.betAmount} SHM</td>
-                        <td>x{player.multiplier}</td>
-                        <td>{player.payout} SHM</td>
-                        <td>x{player.gameMultiplier}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              )}
-            </table>
+            <div className="mt-10">
+              <table className="table-body font-VT323">
+                <thead className="text-gray-600">
+                  <tr>
+                    <th>Player</th>
+                    <th>Bet Amount</th>
+                    <th>Multiplier</th>
+                    <th>Payout</th>
+                    <th>Crsh</th>
+                  </tr>
+                </thead>
+                {!gameState && (
+                  <tbody>
+                    {playerDetails.map((player, index) => {
+                      return (
+                        <tr
+                          className={
+                            player.payout >= 1
+                              ? `text-green-300`
+                              : `text-red-300`
+                          }
+                          key={index}
+                        >
+                          <td>{player.player}</td>
+                          <td>{player.betAmount} SHM</td>
+                          <td>x{player.multiplier}</td>
+                          <td>{player.payout} SHM</td>
+                          <td>x{player.gameMultiplier}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                )}
+              </table>
+            </div>
+            <div className="mt-20" />
           </div>
-          <div className="mt-20" />
         </div>
       </div>
     </ToastProvider>
