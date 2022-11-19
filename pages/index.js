@@ -324,7 +324,7 @@ export default function Home({ auth, walletAddress, balance }) {
       <Header walletAddress={walletAddress} balance={balance} auth={auth} />
       <div>
         <div>
-          <div>
+          <div style={{ flex: 1 }}>
             {/* <MultiPlierHistory /> */}
             {gameState ? (
               <GameSpace
@@ -417,44 +417,40 @@ export default function Home({ auth, walletAddress, balance }) {
                 </div>
               </div>
             </div>
-
-            <div className="mt-10">
-              <table className="table-body font-VT323">
-                <thead className="text-gray-600">
-                  <tr>
-                    <th>Player</th>
-                    <th>Bet Amount</th>
-                    <th>Multiplier</th>
-                    <th>Payout</th>
-                    <th>Crsh</th>
-                  </tr>
-                </thead>
-                {!gameState && (
-                  <tbody>
-                    {playerDetails.map((player, index) => {
-                      return (
-                        <tr
-                          className={
-                            player.payout >= 1
-                              ? `text-green-300`
-                              : `text-red-300`
-                          }
-                          key={index}
-                        >
-                          <td>{player.player}</td>
-                          <td>{player.betAmount} SHM</td>
-                          <td>x{player.multiplier}</td>
-                          <td>{player.payout} SHM</td>
-                          <td>x{player.gameMultiplier}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                )}
-              </table>
-            </div>
-            <div className="mt-20" />
           </div>
+        </div>
+        <div className="mt-10 px-10">
+          <table className="table-body font-VT323">
+            <thead className="text-gray-600">
+              <tr>
+                <th>Player</th>
+                <th>Bet Amount</th>
+                <th>Multiplier</th>
+                <th>Payout</th>
+                <th>Crsh</th>
+              </tr>
+            </thead>
+            {!gameState && (
+              <tbody>
+                {playerDetails.map((player, index) => {
+                  return (
+                    <tr
+                      className={
+                        player.payout >= 1 ? `text-green-300` : `text-red-300`
+                      }
+                      key={index}
+                    >
+                      <td>{player.player}</td>
+                      <td>{player.betAmount} SHM</td>
+                      <td>x{player.multiplier}</td>
+                      <td>{player.payout} SHM</td>
+                      <td>x{player.gameMultiplier}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            )}
+          </table>
         </div>
       </div>
     </ToastProvider>

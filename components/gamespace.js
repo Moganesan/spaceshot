@@ -88,7 +88,6 @@ const GameSpace = ({ transaction, multiplier }) => {
         style={{ height: 500 }}
         className="border-2 text-yellow-400 relative h-96 smb:mx-4 md:mx-10 my-10  overflow-hidden rounded-lg border-yellow-400"
       >
-        {multiplier}
         <video autoPlay="true" loop="true" muted id="gamebackground">
           <source src="/bge.mp4" type="video/mp4" />
         </video>
@@ -98,7 +97,11 @@ const GameSpace = ({ transaction, multiplier }) => {
         </div>
         <div className="absolute multiplier flex items-center top-72">
           <span className="font-VT323 multiplier-text text-6xl text-white">
-            {currentMultiplier.toString()}
+            {currentMultiplier.toString().split(".")[0].length == 1
+              ? currentMultiplier.toString().slice(0, 3)
+              : currentMultiplier.toString().split(".")[0].length == 2
+              ? currentMultiplier.toString().slice(0, 4)
+              : currentMultiplier.toString().slice(0, 5)}
           </span>
           <span className="ml-1 text-6xl font-VT323">x</span>
         </div>
