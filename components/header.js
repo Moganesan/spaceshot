@@ -70,8 +70,11 @@ const Header = ({ walletAddress, balance, auth }) => {
           method: "wallet_switchEthereumChain",
           params: [{ chainId: ethers.utils.hexValue(8081) }], // chainId must be in hexadecimal numbers
         });
+
+        await contract.deposit({
+          value: ethers.utils.parseEther(depositAmount),
+        });
       } catch (err) {
-        console.log("Error From Network Change", err);
         // This error code indicates that the chain has not been added to MetaMask
         // if it is not, then install it into the user MetaMask
         if (error.code === 4902) {
@@ -97,13 +100,7 @@ const Header = ({ walletAddress, balance, auth }) => {
         }
       }
 
-      await contract.deposit({
-        value: ethers.utils.parseEther(depositAmount),
-      });
-
-      console.log("Deposit Amount", depositAmount);
       const res = await axios.post("/deposit", { amount: depositAmount });
-      console.log("res", res);
       setAccountBalance(res.data.data.walletBalance);
       dispatch(
         setSuccessMessage({
@@ -115,8 +112,8 @@ const Header = ({ walletAddress, balance, auth }) => {
       setDepositAmount("");
     } catch (err) {
       setLoading(false);
-      dispatch(setErrorMessage({ code: err.code, message: err.message }));
-      console.log(err);
+      window.location.reload();
+      // dispatch(setErrorMessage({ code: err.code, message: err.message }));
     }
   };
 
@@ -492,12 +489,12 @@ const Header = ({ walletAddress, balance, auth }) => {
                         >
                           WITHDRAW
                         </button>
-                        <button onClick={() => getBalance()}>
+                        {/* <button onClick={() => getBalance()}>
                           Get Balance
                         </button>
                         <button onClick={() => getGameBalance()}>
                           Get Game balance
-                        </button>
+                        </button> */}
                       </div>
                       <h1 className="font-VT323 text-3xl mt-3">
                         Balance : {accountBalace} SHM
