@@ -31,3 +31,9 @@ model sessions {
   createdAt DateTime @default(now())
   token     String   @db.LongText
 }
+
+model multiplierHistory {
+  id         Int      @id @default(autoincrement())
+  multiplier Float
+  time       DateTime
+}

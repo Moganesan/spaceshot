@@ -14,9 +14,9 @@ export default async function withdraw(req, res) {
 
   const verify = jwt.verify(token, process.env.AUTH_TOKEN_PRIVATE_KEY);
   const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
-  const rpc_url = process.env.RPC_URL;
-  const network_name = process.env.NETWORK_NAME;
-  const chainId = parseInt(process.env.CHAIN_ID);
+  const rpc_url = process.env.NEXT_PUBLIC_RPC_URL;
+  const network_name = process.env.NEXT_PUBLIC_NETWORK_NAME;
+  const chainId = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID);
   const provider = new ethers.providers.JsonRpcProvider(rpc_url, {
     name: network_name,
     chainId: chainId,

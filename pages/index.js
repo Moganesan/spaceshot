@@ -325,7 +325,7 @@ export default function Home({ auth, walletAddress, balance }) {
       <div>
         <div>
           <div style={{ flex: 1 }}>
-            {/* <MultiPlierHistory /> */}
+            <MultiPlierHistory />
             {gameState ? (
               <GameSpace
                 transaction={transaction}
