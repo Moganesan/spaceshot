@@ -66,12 +66,12 @@ export default function Home({ auth, walletAddress, balance }) {
   };
 
   const incrementBetAmount = () => {
-    setAmount((a) => a + 1);
+    setAmount((a) => parseInt(a) + 1);
   };
 
   const decrementAmount = () => {
     if (amount <= 1) return;
-    setAmount((a) => a - 1);
+    setAmount((a) => parseInt(a) - 1);
   };
 
   const minBetAmount = () => {
@@ -79,7 +79,7 @@ export default function Home({ auth, walletAddress, balance }) {
   };
 
   const maxBetAmount = () => {
-    setAmount(50);
+    setAmount(10);
   };
 
   function crashPointFromHash(serverSeed) {

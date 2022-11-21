@@ -100,13 +100,18 @@ export default async function betAmount(req, res) {
 
     console.log("Transaction is Completed");
 
+    console.log("Profit", ethers.utils.formatEther(profit));
+
     return res.status(200).send({
       status: 200,
       data: {
         amount: ethers.utils.formatEther(_amount),
         multiplier: ethers.utils.formatUnits(_multiplier),
         crash: ethers.utils.formatUnits(_gameMultiplier),
-        profit: ethers.utils.formatEther(profit),
+        profit:
+          parseInt(ethers.utils.formatEther(profit)) !== 0
+            ? amount * ethers.utils.formatUnits(_multiplier)
+            : 0,
       },
     });
   } catch (err) {
