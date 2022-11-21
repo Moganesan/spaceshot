@@ -62,6 +62,13 @@ const Header = ({ walletAddress, balance, auth }) => {
     );
 
     try {
+      await axios.get("/checkAccess");
+    } catch (err) {
+      dispatch(setErrorMessage({ status: "200", message: "Access Denied" }));
+      return;
+    }
+
+    try {
       setLoading(true);
 
       // check if the chain to connect to is installed

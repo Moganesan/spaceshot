@@ -17,6 +17,11 @@ model players {
   sessions      sessions[]
 }
 
+model whitelistedPlayers {
+  id            Int    @id @default(autoincrement())
+  walletAddress String @unique
+}
+
 model contracts {
   id            Int      @id @default(autoincrement())
   walletAddress String

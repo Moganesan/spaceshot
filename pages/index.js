@@ -33,7 +33,7 @@ import {
 import { ToastPortal } from "../components/ToastPortal";
 
 export default function Home({ auth, walletAddress, balance }) {
-  const [amount, setAmount] = useState(0);
+  const [amount, setAmount] = useState(1);
   const [multiplier, SetMultiplier] = useState(0);
   const [clientSeed, setClientSeed] = useState("");
   const [seconds, setSeconds] = useState(20);

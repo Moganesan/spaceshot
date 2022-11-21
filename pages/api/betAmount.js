@@ -14,6 +14,18 @@ export default async function betAmount(req, res) {
 
   const verify = jwt.verify(token, process.env.AUTH_TOKEN_PRIVATE_KEY);
 
+  const checkAccess = await prisma.whitelistedPlayers.findUnique({
+    where: {
+      walletAddress: verify.walletAddress,
+    },
+  });
+
+  if (!checkAccess)
+    return res.status(201).send({
+      status: 201,
+      message: "Unauthorized Request",
+    });
+
   const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
   const rpc_url = process.env.NEXT_PUBLIC_RPC_URL;
   const network_name = process.env.NEXT_PUBLIC_NETWORK_NAME;
