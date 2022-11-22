@@ -29,6 +29,7 @@ import { ToastProvider } from "react-toast-notifications";
 import {
   setErrorMessage,
   setSuccessMessage,
+  setInfoMessage,
 } from "../store/features/alertMessageSlice";
 import { ToastPortal } from "../components/ToastPortal";
 
@@ -138,6 +139,13 @@ export default function Home({ auth, walletAddress, balance }) {
   };
   const placeBet = async () => {
     if (amount == 0 || multiplier == 0) return;
+    if (amount > 5 && multiplier > 100)
+      dispatch(
+        setInfoMessage({
+          status: "200",
+          message: "Max Amount:5 Max Multiplier: 100",
+        })
+      );
     if (transaction) return;
 
     const multiplierCrash = await getBlockHash();
@@ -391,7 +399,7 @@ export default function Home({ auth, walletAddress, balance }) {
                     <div className="border-2 h-20 md:w-96 smb:w-full border-yellow-400 px-3 py-3 rounded-md flex flex-col">
                       <div>
                         <span className="font-VT323 text-gray-300">
-                          Auto Cashout
+                          Predicted Multiplier
                         </span>
                         <div className="flex items-center">
                           <span className="font-VT323 text-2xl ml-2">X</span>
@@ -434,7 +442,7 @@ export default function Home({ auth, walletAddress, balance }) {
             <thead className="text-gray-600">
               <tr>
                 <th>Player</th>
-                <th>Bet Amount</th>
+                <th>Predicted Amount</th>
                 <th>Multiplier</th>
                 <th>Payout</th>
                 <th>Crsh</th>

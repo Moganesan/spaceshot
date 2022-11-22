@@ -21,8 +21,8 @@ export default async function betAmount(req, res) {
   });
 
   if (!checkAccess)
-    return res.status(201).send({
-      status: 201,
+    return res.status(403).send({
+      status: 403,
       message: "Unauthorized Request",
     });
 

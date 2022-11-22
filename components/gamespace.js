@@ -88,6 +88,7 @@ const GameSpace = ({ transaction, multiplier }) => {
         style={{ height: 500 }}
         className="border-2 text-yellow-400 relative h-96 smb:mx-4 md:mx-10 my-10  overflow-hidden rounded-lg border-yellow-400"
       >
+        {multiplier}
         <video autoPlay="true" loop="true" muted id="gamebackground">
           <source src="/bge.mp4" type="video/mp4" />
         </video>

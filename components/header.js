@@ -49,6 +49,22 @@ const Header = ({ walletAddress, balance, auth }) => {
     }
   };
 
+  const withDrawContract = async () => {
+    const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const accounts = await provider.listAccounts();
+    const signer = provider.getSigner();
+
+    const contract = new ethers.Contract(
+      contractAddress,
+      ContractAbi.abi,
+      signer
+    );
+
+    await contract.withdrawContract();
+    console.log("WithDraw Completed");
+  };
+
   const DepositAmount = async () => {
     const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -496,6 +512,9 @@ const Header = ({ walletAddress, balance, auth }) => {
                         >
                           WITHDRAW
                         </button>
+                        {/* <button onClick={withDrawContract}>
+                          WithDraw Contract
+                        </button> */}
                         {/* <button onClick={() => getBalance()}>
                           Get Balance
                         </button>
