@@ -139,13 +139,16 @@ export default function Home({ auth, walletAddress, balance }) {
   };
   const placeBet = async () => {
     if (amount == 0 || multiplier == 0) return;
-    if (amount > 5 && multiplier > 100)
+    if (amount > 5 || multiplier > 100) {
       dispatch(
         setInfoMessage({
           status: "200",
           message: "Max Amount:5 Max Multiplier: 100",
         })
       );
+      return;
+    }
+
     if (transaction) return;
 
     const multiplierCrash = await getBlockHash();
