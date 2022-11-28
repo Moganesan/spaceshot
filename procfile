@@ -1,1 +1,1 @@
-web: npm install --force && npm install --save-dev hardhat --force && npx prisma migrate && npx prisma generate && npm run build
+web: npm install --force
