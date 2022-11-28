@@ -1,0 +1,40 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "/Users/moganesanm/Desktop/blockchain/spaceshot/contracts/Spaceshot.sol": {
+      "lastModificationDate": 1669106094692,
+      "contentHash": "75b4bd9affe454630bf808f6b54824c1",
+      "sourceName": "contracts/Spaceshot.sol",
+      "solcConfig": {
+        "version": "0.8.17",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Spaceshot"
+      ]
+    }
+  }
+}
