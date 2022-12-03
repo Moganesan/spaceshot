@@ -88,40 +88,45 @@ const Header = ({ walletAddress, balance, auth }) => {
       setLoading(true);
 
       // check if the chain to connect to is installed
-      try {
-        await window.ethereum.request({
-          method: "wallet_switchEthereumChain",
-          params: [{ chainId: ethers.utils.hexValue(8081) }], // chainId must be in hexadecimal numbers
-        });
+      // try {
+      //   await window.ethereum.request({
+      //     method: "wallet_switchEthereumChain",
+      //     params: [{ chainId: ethers.utils.hexValue(8081) }], // chainId must be in hexadecimal numbers
+      //   });
 
-        await contract.deposit({
-          value: ethers.utils.parseEther(depositAmount),
-        });
-      } catch (err) {
-        // This error code indicates that the chain has not been added to MetaMask
-        // if it is not, then install it into the user MetaMask
-        if (error.code === 4902) {
-          try {
-            await window.ethereum.request({
-              method: "wallet_addEthereumChain",
-              params: [
-                {
-                  chainId: ethers.utils.hexValue(8081),
-                  rpcUrl: process.env.NEXT_PUBLIC_RPC_URL,
-                  chainName: process.env.NEXT_PUBLIC_NETWORK_NAME,
-                  nativeCurrency: {
-                    name: process.env.NEXT_PUBLIC_CURRENCY_NAME,
-                    symbol: process.env.NEXT_PUBLIC_CURRENCY_SYMBOL,
-                    decimals: 18,
-                  },
-                },
-              ],
-            });
-          } catch (addError) {
-            console.error(addError);
-          }
-        }
-      }
+      //   await contract.deposit({
+      //     value: ethers.utils.parseEther(depositAmount),
+      //   });
+      // } catch (err) {
+      //   // This error code indicates that the chain has not been added to MetaMask
+      //   // if it is not, then install it into the user MetaMask
+      //   if (error.code === 4902) {
+      //     try {
+      //       await window.ethereum.request({
+      //         method: "wallet_addEthereumChain",
+      //         params: [
+      //           {
+      //             chainId: ethers.utils.hexValue(8081),
+      //             rpcUrl: process.env.NEXT_PUBLIC_RPC_URL,
+      //             chainName: process.env.NEXT_PUBLIC_NETWORK_NAME,
+      //             nativeCurrency: {
+      //               name: process.env.NEXT_PUBLIC_CURRENCY_NAME,
+      //               symbol: process.env.NEXT_PUBLIC_CURRENCY_SYMBOL,
+      //               decimals: 18,
+      //             },
+      //           },
+      //         ],
+      //       });
+      //     } catch (addError) {
+      //       console.error(addError);
+      //     }
+      //   }
+      //   return;
+      // }
+
+      await contract.deposit({
+        value: ethers.utils.parseEther(depositAmount),
+      });
 
       const res = await axios.post("/deposit", { amount: depositAmount });
       setAccountBalance(res.data.data.walletBalance);

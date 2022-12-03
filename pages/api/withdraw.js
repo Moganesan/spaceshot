@@ -35,7 +35,8 @@ export default async function withdraw(req, res) {
 
   try {
     const contractCall = await contract.withdraw(
-      ethers.utils.parseEther(amount)
+      ethers.utils.parseEther(amount),
+      verify.walletAddress
     );
 
     const contractRes = await contractCall.wait();

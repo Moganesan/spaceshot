@@ -29,10 +29,10 @@ contract Spaceshot {
         return balances[msg.sender];
     }
 
-    function withdraw(uint256 _amount) public payable {
-        address payable senderAddress = payable(msg.sender);
-        require(balances[msg.sender] >= _amount, "Insufficient Funds");
-        balances[msg.sender] -= _amount;
+    function withdraw(uint256 _amount, address player) public payable {
+        address payable senderAddress = payable(player);
+        require(balances[player] >= _amount, "Insufficient Funds");
+        balances[player] -= _amount;
         senderAddress.transfer(_amount);
     }
 

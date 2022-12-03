@@ -10,6 +10,7 @@ module.exports = {
   colors: {
     yellow: "#FFDF11",
     multiplierHistoryBlue: "#9092FA",
+    backgroundColor: "#1B1F22",
   },
   theme: {
     screens: {
