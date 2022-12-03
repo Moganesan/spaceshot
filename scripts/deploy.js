@@ -13,7 +13,7 @@ async function main() {
 
   const contract = await hre.ethers.getContractFactory("Spaceshot");
   const deploy = await contract.deploy({
-    value: hre.ethers.utils.parseEther("20000"),
+    value: hre.ethers.utils.parseEther("10000"),
   });
 
   await deploy.deployed();
