@@ -24,9 +24,8 @@ contract Spaceshot {
         uint256 profit
     );
 
-    function deposit() public payable returns (uint256) {
+    function deposit() public payable {
         balances[msg.sender] += msg.value;
-        return balances[msg.sender];
     }
 
     function withdraw(uint256 _amount, address player) public payable {

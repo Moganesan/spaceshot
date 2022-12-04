@@ -4,10 +4,12 @@ const About = () => {
     <div>
       <Header />
       <div className="px-10 mt-10">
-        <h1 className="font-bold text-3xl">Get ready for the rocket launch!</h1>
         <div className="mt-5">
-          <h1 className="font-bold text-xl">About</h1>
-          <p>
+          <h1 className="font-bold text-center text-3xl">About</h1>
+          <h1 className="font-bold text-3xl text-center mt-5 text-yellow-100 animate-pulse">
+            Get ready for the rocket launch!
+          </h1>
+          <p className="text-center mt-3 text-xl">
             Spaceshot is a prediction game that&lsquo;s simple, fun, and fair.
             <br /> All you need to do is predict the distance of the rocket
             before it randomly crashes.

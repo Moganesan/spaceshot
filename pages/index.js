@@ -42,6 +42,8 @@ export default function Home({ auth, walletAddress, balance }) {
   const [openMetaMask, setOpenMetaMask] = useState(false);
   const gameState = useSelector((state) => state.ui["startGame"]);
   const [transaction, setTransaction] = useState(false);
+  const [amountInputBoxError, setAmountInputBoxError] = useState(false);
+  const [multiplierInputBoxError, setMultiplierInputBoxError] = useState(false);
   const [multiplierCrash, setMultiplierCrash] = useState("");
   const [accountBalance, setAccountBalance] = useState(0);
 
@@ -68,11 +70,23 @@ export default function Home({ auth, walletAddress, balance }) {
 
   const incrementBetAmount = () => {
     setAmount((a) => parseInt(a) + 1);
+    if (amount > 5) {
+      console.log("Set Error True");
+      setAmountInputBoxError(true);
+    } else {
+      setAmountInputBoxError(false);
+    }
   };
 
   const decrementAmount = () => {
     if (amount <= 1) return;
     setAmount((a) => parseInt(a) - 1);
+    if (amount > 5) {
+      console.log("Set Error True");
+      setAmountInputBoxError(true);
+    } else {
+      setAmountInputBoxError(false);
+    }
   };
 
   const minBetAmount = () => {
@@ -329,6 +343,25 @@ export default function Home({ auth, walletAddress, balance }) {
     }
   };
 
+  const changeAmountListener = (amount) => {
+    setAmount(amount);
+    if (amount > 5) {
+      console.log("Set Error True");
+      setAmountInputBoxError(true);
+    } else {
+      setAmountInputBoxError(false);
+    }
+  };
+
+  const changeMultiplierListener = (multiplier) => {
+    SetMultiplier(multiplier);
+    if (multiplier > 5) {
+      setMultiplierInputBoxError(true);
+    } else {
+      setMultiplierInputBoxError(false);
+    }
+  };
+
   return (
     <ToastProvider>
       <ToastPortal ref={toastRef} autoClose={true} />
@@ -352,12 +385,18 @@ export default function Home({ auth, walletAddress, balance }) {
               <div>
                 <div className="flex flex-col">
                   <div className="smb:mt-10">
-                    <div className="border-2 h-20 md:w-96 smb:w-full border-yellow-400 px-3 py-3 rounded-md flex flex-col">
+                    <div
+                      className={`border-2 h-20 md:w-96 smb:w-full  px-3 py-3 rounded-md flex flex-col ${
+                        amountInputBoxError
+                          ? "border-red-400"
+                          : "border-yellow-400"
+                      }`}
+                    >
                       <span className="font-VT323 text-gray-300">Amount</span>
                       <input
                         value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
-                        className="text-white h-10 font-VT323 outline-none bg-transparent px-2 text-2xl"
+                        onChange={(e) => changeAmountListener(e.target.value)}
+                        className={`text-white h-10 font-VT323 outline-none bg-transparent px-2 text-2xl`}
                         type={"number"}
                       />
                     </div>
@@ -399,7 +438,13 @@ export default function Home({ auth, walletAddress, balance }) {
                     </div>
                   </div>
                   <div>
-                    <div className="border-2 h-20 md:w-96 smb:w-full border-yellow-400 px-3 py-3 rounded-md flex flex-col">
+                    <div
+                      className={`border-2 h-20 md:w-96 smb:w-full  px-3 py-3 rounded-md flex flex-col ${
+                        multiplierInputBoxError
+                          ? "border-red-400"
+                          : "border-yellow-400"
+                      }`}
+                    >
                       <div>
                         <span className="font-VT323 text-gray-300">
                           Predicted Multiplier
@@ -407,7 +452,9 @@ export default function Home({ auth, walletAddress, balance }) {
                         <div className="flex items-center">
                           <span className="font-VT323 text-2xl ml-2">X</span>
                           <input
-                            onChange={(e) => SetMultiplier(e.target.value)}
+                            onChange={(e) =>
+                              changeMultiplierListener(e.target.value)
+                            }
                             value={multiplier}
                             type={"number"}
                             className="text-white h-10 outline-none bg-transparent font-VT323 text-2xl px-2"

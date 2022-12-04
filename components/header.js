@@ -11,6 +11,7 @@ import {
 } from "../store/features/alertMessageSlice";
 import ContractAbi from "../artifacts/contracts/Spaceshot.sol/Spaceshot.json";
 import { useDispatch } from "react-redux";
+import Link from "next/link";
 
 const Header = ({ walletAddress, balance, auth }) => {
   let [openSettingsModal, setOpenSettingsModal] = useState(false);
@@ -88,45 +89,45 @@ const Header = ({ walletAddress, balance, auth }) => {
       setLoading(true);
 
       // check if the chain to connect to is installed
-      // try {
-      //   await window.ethereum.request({
-      //     method: "wallet_switchEthereumChain",
-      //     params: [{ chainId: ethers.utils.hexValue(8081) }], // chainId must be in hexadecimal numbers
-      //   });
+      try {
+        await window.ethereum.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: ethers.utils.hexValue(8081) }], // chainId must be in hexadecimal numbers
+        });
 
-      //   await contract.deposit({
-      //     value: ethers.utils.parseEther(depositAmount),
-      //   });
-      // } catch (err) {
-      //   // This error code indicates that the chain has not been added to MetaMask
-      //   // if it is not, then install it into the user MetaMask
-      //   if (error.code === 4902) {
-      //     try {
-      //       await window.ethereum.request({
-      //         method: "wallet_addEthereumChain",
-      //         params: [
-      //           {
-      //             chainId: ethers.utils.hexValue(8081),
-      //             rpcUrl: process.env.NEXT_PUBLIC_RPC_URL,
-      //             chainName: process.env.NEXT_PUBLIC_NETWORK_NAME,
-      //             nativeCurrency: {
-      //               name: process.env.NEXT_PUBLIC_CURRENCY_NAME,
-      //               symbol: process.env.NEXT_PUBLIC_CURRENCY_SYMBOL,
-      //               decimals: 18,
-      //             },
-      //           },
-      //         ],
-      //       });
-      //     } catch (addError) {
-      //       console.error(addError);
-      //     }
-      //   }
-      //   return;
-      // }
+        await contract.deposit({
+          value: ethers.utils.parseEther(depositAmount),
+        });
+      } catch (err) {
+        // This error code indicates that the chain has not been added to MetaMask
+        // if it is not, then install it into the user MetaMask
+        if (error.code === 4902) {
+          try {
+            await window.ethereum.request({
+              method: "wallet_addEthereumChain",
+              params: [
+                {
+                  chainId: ethers.utils.hexValue(8081),
+                  rpcUrl: process.env.NEXT_PUBLIC_RPC_URL,
+                  chainName: process.env.NEXT_PUBLIC_NETWORK_NAME,
+                  nativeCurrency: {
+                    name: process.env.NEXT_PUBLIC_CURRENCY_NAME,
+                    symbol: process.env.NEXT_PUBLIC_CURRENCY_SYMBOL,
+                    decimals: 18,
+                  },
+                },
+              ],
+            });
 
-      await contract.deposit({
-        value: ethers.utils.parseEther(depositAmount),
-      });
+            await contract.deposit({
+              value: ethers.utils.parseEther(depositAmount),
+            });
+          } catch (addError) {
+            console.error(addError);
+          }
+        }
+        return;
+      }
 
       const res = await axios.post("/deposit", { amount: depositAmount });
       setAccountBalance(res.data.data.walletBalance);
@@ -437,15 +438,18 @@ const Header = ({ walletAddress, balance, auth }) => {
                 leaveTo="opacity-0 scale-95"
               >
                 <Dialog.Panel className="bg-gray-900 flex flex-col transform overflow-hidden rounded-sm p-6 text-left align-middle shadow-xl transition-all">
-                  <button className="font-VT323 text-5xl px-20 hover:text-yellow-400">
+                  <Link
+                    href={"/about"}
+                    className="font-VT323 text-5xl px-20 hover:text-yellow-400"
+                  >
                     FAQ
-                  </button>
+                  </Link>
                   <button className="font-VT323 text-5xl px-20 mt-10  hover:text-yellow-400">
-                    STATICS
+                    About
                   </button>
-                  <button className="font-VT323 text-5xl px-20 mt-10  hover:text-yellow-400">
+                  {/* <button className="font-VT323 text-5xl px-20 mt-10  hover:text-yellow-400">
                     LEADBOARD
-                  </button>
+                  </button> */}
                 </Dialog.Panel>
               </Transition.Child>
             </div>
@@ -494,7 +498,7 @@ const Header = ({ walletAddress, balance, auth }) => {
                         />
                         <button
                           onClick={() => !loading && DepositAmount()}
-                          className={`font-VT323 text-2xl px-9 ml-3 bg-yellow-400 h-12 ${
+                          className={`font-VT323 text-2xl w-36 ml-3 bg-yellow-400 h-12 ${
                             loading && "animate-pulse"
                           } `}
                         >
@@ -511,15 +515,15 @@ const Header = ({ walletAddress, balance, auth }) => {
                         />
                         <button
                           onClick={() => !loading && withdraw()}
-                          className={`font-VT323 text-2xl px-9 ml-3 bg-yellow-400 h-12 ${
+                          className={`font-VT323 text-2xl w-36 ml-3 bg-yellow-400 h-12 ${
                             loading && "animate-pulse"
                           }`}
                         >
                           WITHDRAW
                         </button>
-                        {/* <button onClick={withDrawContract}>
+                        <button onClick={withDrawContract}>
                           WithDraw Contract
-                        </button> */}
+                        </button>
                         {/* <button onClick={() => getBalance()}>
                           Get Balance
                         </button>
