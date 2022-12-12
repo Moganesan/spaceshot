@@ -521,9 +521,9 @@ const Header = ({ walletAddress, balance, auth }) => {
                         >
                           WITHDRAW
                         </button>
-                        <button onClick={withDrawContract}>
+                        {/* <button onClick={withDrawContract}>
                           WithDraw Contract
-                        </button>
+                        </button> */}
                         {/* <button onClick={() => getBalance()}>
                           Get Balance
                         </button>
